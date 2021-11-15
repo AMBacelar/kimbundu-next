@@ -23,9 +23,9 @@ const i18n = {
     pt: "Resultados da pesquisa para \"XXXXXX\" 🧐"
   },
   noResults: {
-    en: "No results found",
-    fr: "Aucun résultat trouvé",
-    pt: "Nenhum resultado encontrado"
+    en: "No results found | please make sure that you are searching in the correct language",
+    fr: "Aucun résultat trouvé | s'il vous plaît assurez-vous que vous recherchez dans la bonne langue",
+    pt: "Nenhum resultado encontrado | certifique-se de que está pesquisando no idioma correto"
   },
 }
 
@@ -33,7 +33,7 @@ const SearchResultPage = ({ results, term }: Props) => {
   const router = useRouter();
   const { locale } = router;
   const t = (stringPath: string, stringReplace?: string) => {
-    let result = i18n[stringPath][locale]
+    let result = i18n[stringPath][locale];
     if (stringReplace) {
       result = result.replace('XXXXXX', stringReplace)
     }
@@ -45,7 +45,7 @@ const SearchResultPage = ({ results, term }: Props) => {
       <h1>{t('searchResult', term)}</h1>
       <SearchBar />
       {results.length === 0 ? (
-        <div>{t('noResult')}</div>
+        <div>{t('noResults')}</div>
       ) : (
         results.map((result) => (
           <DictionaryEntryComponent key={result.id} entry={result} />
