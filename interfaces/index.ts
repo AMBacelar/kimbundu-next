@@ -8,3 +8,19 @@ export type User = {
   id: number
   name: string
 }
+
+export type DictionaryEntry = {
+  context: number[],
+  tags: number[],
+  diacriticFree: string,
+  translations: {
+    en: string,
+    en_df: string,
+    pt: string,
+    pt_df: string
+  },
+  literalTranslations: { en: string, pt: string },
+  kimbunduText: string,
+  class: string[],
+  id: string
+}
