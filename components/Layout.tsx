@@ -3,6 +3,7 @@ import { Menu } from 'semantic-ui-react'
 import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from 'next/router';
+import styles from './Layout.module.scss';
 
 type Props = {
   children?: ReactNode;
@@ -91,8 +92,8 @@ const Layout = ({ children, title = "This is the default title", description, }:
           </Menu.Menu>
         </Menu>
       </header>
-      {children}
-      <footer>
+      <div className={styles["wrapper"]}>{children}</div>
+      <footer className={styles["wrapper"]}>
         <hr />
         <span>© Adilson Bacelar 2021</span>
       </footer>
