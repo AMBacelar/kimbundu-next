@@ -1,5 +1,7 @@
-import admin from "firebase-admin"
-const serviceAccount = JSON.parse(process.env.FIRESTORE_SERVICE_ACCOUNT_DATA);
+import admin from 'firebase-admin';
+const serviceAccount = JSON.parse(
+  process.env.NEXT_PUBLIC_FIRESTORE_SERVICE_ACCOUNT_DATA
+);
 
 if (!admin.apps.length) {
   try {
