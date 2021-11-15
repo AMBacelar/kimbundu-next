@@ -18,6 +18,10 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
       {entry.literalTranslations.en && (
         <p>literal translation English: {entry.literalTranslations.en}</p>
       )}
+      <p>French Translation: {entry.translations.fr}</p>
+      {entry.literalTranslations.en && (
+        <p>literal translation French: {entry.literalTranslations.fr}</p>
+      )}
       <p>context:</p>
       <p>class:</p>
       <p>tags:</p>

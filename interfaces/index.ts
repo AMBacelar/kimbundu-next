@@ -5,22 +5,24 @@
 // import { User } from 'path/to/interfaces';
 
 export type User = {
-  id: number
-  name: string
-}
+  id: number;
+  name: string;
+};
 
 export type DictionaryEntry = {
-  context: number[],
-  tags: number[],
-  diacriticFree: string,
+  context: number[];
+  tags: number[];
+  diacriticFree: string;
   translations: {
-    en: string,
-    en_df: string,
-    pt: string,
-    pt_df: string
-  },
-  literalTranslations: { en: string, pt: string },
-  kimbunduText: string,
-  class: string[],
-  id: string
-}
+    en: string;
+    en_df: string;
+    pt: string;
+    pt_df: string;
+    fr: string;
+    fr_df: string;
+  };
+  literalTranslations: { en: string; fr: string; pt: string };
+  kimbunduText: string;
+  class: string[];
+  id: string;
+};

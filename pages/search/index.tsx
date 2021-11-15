@@ -49,6 +49,9 @@ export async function getServerSideProps({ query }) {
     case "portuguese":
       field = "translations.pt_df";
       break;
+    case "french":
+      field = "translations.fr_df";
+      break;
   }
   // const potentialWord = params.kimbunduText;
   const dictionaryRef = firestore.collection("dictionary");

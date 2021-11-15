@@ -51,6 +51,13 @@ export const SearchBar = ({ searchTerm }: Props) => {
           />
           <Form.Field
             control={Radio}
+            label="French Text"
+            value="french"
+            checked={searchField === "french"}
+            onChange={() => setSearchField("french")}
+          />
+          <Form.Field
+            control={Radio}
             label="English Text"
             value="english"
             checked={searchField === "english"}
