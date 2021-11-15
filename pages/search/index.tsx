@@ -11,20 +11,49 @@ type Props = {
   term: string;
 };
 
-const SearchResultPage = ({ results, term }: Props) => (
-  <Layout title={`Search for ${term} | Online Kimbundu dictionary`}>
-    <h1>Search results for {term} 🧐 </h1>
-    <SearchBar />
-    <hr />
-    {results.length === 0 ? (
-      <div>No results found</div>
-    ) : (
-      results.map((result) => (
-        <DictionaryEntryComponent key={result.id} entry={result} />
-      ))
-    )}
-  </Layout>
-);
+const i18n = {
+  baseTitle: {
+    en: "Online Kimbundu dictionary",
+    fr: "Dictionnaire Kimbundu en ligne",
+    pt: "Dicionário Kimbundu online"
+  },
+  searchResult: {
+    en: "Search results for \"XXXXXX\" 🧐 ",
+    fr: "Résultats de la recherche pour \"XXXXXX\" 🧐",
+    pt: "Resultados da pesquisa para \"XXXXXX\" 🧐"
+  },
+  noResults: {
+    en: "No results found",
+    fr: "Aucun résultat trouvé",
+    pt: "Nenhum resultado encontrado"
+  },
+}
+
+const SearchResultPage = ({ results, term }: Props) => {
+  const router = useRouter();
+  const { locale } = router;
+  const t = (stringPath: string, stringReplace?: string) => {
+    let result = i18n[stringPath][locale]
+    if (stringReplace) {
+      result = result.replace('XXXXXX', stringReplace)
+    }
+    return result;
+  };
+
+  return (
+    <Layout title={`${term} | ${t('baseTitle')}`} >
+      <h1>{t('searchResult', term)}</h1>
+      <SearchBar />
+      {results.length === 0 ? (
+        <div>{t('noResult')}</div>
+      ) : (
+        results.map((result) => (
+          <DictionaryEntryComponent key={result.id} entry={result} />
+        ))
+      )}
+    </Layout>
+  )
+};
 
 export default SearchResultPage;
 
