@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Card, Flag, Message, Label, Segment } from "semantic-ui-react";
 import styles from "./styles.module.scss";
-// import { ClassBadge } from "../classBadge";
+import { ClassBadge } from "../classBadge";
 
 type Props = {
   entry: DictionaryEntry;
@@ -61,7 +61,7 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
   return (
     <div className={styles["wrapper"]}>
       <Card fluid>
-        {/* <ClassBadge classNumber={entry.class[0]} /> */}
+        {entry.class.length > 0 && <ClassBadge classNumber={entry.class[0]} />}
         <Card.Content>
           <Link href={desinationUrl}>
             <Card.Header>

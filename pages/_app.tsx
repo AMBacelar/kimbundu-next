@@ -20,7 +20,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     };
 
     const handleRouteChangeStart = (url, { shallow }) => {
-      if (url.includes("/entry/") || url.includes("/search?")) {
+      if (
+        url.includes("/entry/") ||
+        url.includes("/search?") ||
+        url.includes("/class/")
+      ) {
         setLoading(true);
       }
     };
