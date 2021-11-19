@@ -1,6 +1,4 @@
-import Link from "next/link";
 import Layout from "../components/Layout";
-import { useRouter } from "next/router";
 import { Placeholder } from "semantic-ui-react";
 import EntryPlaceholder from "../components/entryPlaceholder";
 import { SearchBar } from "../components/searchBar";
@@ -8,7 +6,7 @@ import { SearchBar } from "../components/searchBar";
 const LoadingEntries = () => {
   return (
     <Layout>
-      <Placeholder>
+      <Placeholder style={{ marginBottom: 20 }}>
         <Placeholder.Header>
           <Placeholder.Line />
           <Placeholder.Line />
