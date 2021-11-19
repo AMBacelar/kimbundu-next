@@ -9,50 +9,51 @@ import { useRouter } from "next/router";
 type Props = {
   results?: DictionaryEntry[];
   term: string;
+  destination: string;
 };
 
 const i18n = {
   baseTitle: {
     en: "Online Kimbundu dictionary",
     fr: "Dictionnaire Kimbundu en ligne",
-    pt: "Dicionário Kimbundu online"
+    pt: "Dicionário Kimbundu online",
   },
   searchResult: {
-    en: "Search results for \"XXXXXX\" 🧐 ",
-    fr: "Résultats de la recherche pour \"XXXXXX\" 🧐",
-    pt: "Resultados da pesquisa para \"XXXXXX\" 🧐"
+    en: 'Search results for "XXXXXX" 🧐 ',
+    fr: 'Résultats de la recherche pour "XXXXXX" 🧐',
+    pt: 'Resultados da pesquisa para "XXXXXX" 🧐',
   },
   noResults: {
     en: "No results found | please make sure that you are searching in the correct language",
     fr: "Aucun résultat trouvé | s'il vous plaît assurez-vous que vous recherchez dans la bonne langue",
-    pt: "Nenhum resultado encontrado | certifique-se de que está pesquisando no idioma correto"
+    pt: "Nenhum resultado encontrado | certifique-se de que está pesquisando no idioma correto",
   },
-}
+};
 
-const SearchResultPage = ({ results, term }: Props) => {
+const SearchResultPage = ({ results, term, destination }: Props) => {
   const router = useRouter();
   const { locale } = router;
   const t = (stringPath: string, stringReplace?: string) => {
     let result = i18n[stringPath][locale];
     if (stringReplace) {
-      result = result.replace('XXXXXX', stringReplace)
+      result = result.replace("XXXXXX", stringReplace);
     }
     return result;
   };
 
   return (
-    <Layout title={`${term} | ${t('baseTitle')}`} >
-      <h1>{t('searchResult', term)}</h1>
-      <SearchBar />
+    <Layout title={`${term} | ${t("baseTitle")}`}>
+      <h1>{t("searchResult", term)}</h1>
+      <SearchBar searchTerm={term} destination={destination} />
       {results.length === 0 ? (
-        <div>{t('noResults')}</div>
+        <div>{t("noResults")}</div>
       ) : (
         results.map((result) => (
           <DictionaryEntryComponent key={result.id} entry={result} />
         ))
       )}
     </Layout>
-  )
+  );
 };
 
 export default SearchResultPage;
@@ -96,6 +97,7 @@ export async function getServerSideProps({ query }) {
   return {
     props: {
       term: query.term,
+      destination: query.destination,
       results,
     }, // will be passed to the page component as props
   };
