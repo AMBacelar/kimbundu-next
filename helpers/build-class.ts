@@ -1,4 +1,6 @@
-const classList = [
+import { ClassObject } from "../interfaces"
+
+const classList:ClassObject[] = [
   {
     "index": 0,
     "display": "I",
@@ -201,4 +203,4 @@ const classList = [
   }
 ]
 
-export const buildClass = (classNumber: string) => classList[Number(classNumber)]
+export const buildClass = (classNumber: string):ClassObject => classList[Number(classNumber)]

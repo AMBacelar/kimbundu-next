@@ -63,11 +63,11 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
       <Card fluid>
         {entry.class.length > 0 && <ClassBadge classNumber={entry.class[0]} />}
         <Card.Content>
-          <Link href={desinationUrl}>
-            <Card.Header>
+          <Card.Header>
+            <Link passHref href={desinationUrl}>
               <a>{entry.kimbunduText}</a>
-            </Card.Header>
-          </Link>
+            </Link>
+          </Card.Header>
           <Card.Meta>{`${t("diaFree")}${entry.diacriticFree}`}</Card.Meta>
           <Card.Description>
             <Message>
@@ -96,7 +96,6 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
         </Card.Content>
       </Card>
       {/* <p>context:</p>
-      <p>class:</p>
       <p>tags:</p> */}
     </div>
   );

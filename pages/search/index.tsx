@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Layout from "../../components/Layout";
 import firestore from "../../utils/firestore";
 import { DictionaryEntry } from "../../interfaces";

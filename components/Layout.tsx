@@ -1,9 +1,9 @@
 import React, { ReactNode } from "react";
-import { Menu } from 'semantic-ui-react'
+import { Menu } from "semantic-ui-react";
 import Link from "next/link";
 import Head from "next/head";
-import { useRouter } from 'next/router';
-import styles from './Layout.module.scss';
+import { useRouter } from "next/router";
+import styles from "./Layout.module.scss";
 
 type Props = {
   children?: ReactNode;
@@ -14,30 +14,35 @@ type Props = {
 
 const i18n = {
   about: {
-    en: 'About',
-    fr: 'À propos',
-    pt: 'Sobre Nós'
+    en: "About",
+    fr: "À propos",
+    pt: "Sobre Nós",
   },
   home: {
-    en: 'Home',
-    fr: 'Accueil',
-    pt: 'Pagina inicial'
+    en: "Home",
+    fr: "Accueil",
+    pt: "Pagina inicial",
   },
   defaultDescription: {
-    en: '(Soon to be) The first place you should look to learn Kimbundu',
-    fr: '(Bientôt) Le premier endroit où vous devriez chercher pour apprendre le Kimbundu',
-    pt: '(Em breve) O primeiro lugar que você deve procurar para aprender Kimbundu'
-  }
-}
+    en: "(Soon to be) The first place you should look to learn Kimbundu",
+    fr: "(Bientôt) Le premier endroit où vous devriez chercher pour apprendre le Kimbundu",
+    pt: "(Em breve) O primeiro lugar que você deve procurar para aprender Kimbundu",
+  },
+};
 
-const Layout = ({ children, title = "This is the default title", description, }: Props) => {
+const Layout = ({
+  children,
+  title = "This is the default title",
+  description,
+}: Props) => {
   const router = useRouter();
-  const hostname = 'https://www.kimbundu.org/';
-  const { pathname, asPath, query, locale } = router
-  const handleChangeLocale = (_, { name }) => router.push({ pathname, query }, asPath, { locale: name.toLowerCase() });
+  const hostname = "https://www.kimbundu.org/";
+  const { pathname, asPath, query, locale } = router;
+  const handleChangeLocale = (_, { name }) =>
+    router.push({ pathname, query }, asPath, { locale: name.toLowerCase() });
   const t = (path: string) => i18n[path][locale];
 
-  const trueDescription = description || t('defaultDescription')
+  const trueDescription = description || t("defaultDescription");
   return (
     <div>
       <Head>
@@ -61,32 +66,26 @@ const Layout = ({ children, title = "This is the default title", description, }:
       </Head>
       <header>
         <Menu>
-          <Link href="/">
-            <Menu.Item
-              active={pathname === '/'}
-              name={t('home')}
-            />
+          <Link passHref href="/">
+            <Menu.Item active={pathname === "/"} name={t("home")} />
           </Link>
-          <Link href="/about">
-            <Menu.Item
-              active={pathname === '/about'}
-              name={t('about')}
-            />
+          <Link passHref href="/about">
+            <Menu.Item active={pathname === "/about"} name={t("about")} />
           </Link>
-          <Menu.Menu position='right'>
+          <Menu.Menu position="right">
             <Menu.Item
               name="PT"
-              active={locale === 'pt'}
+              active={locale === "pt"}
               onClick={handleChangeLocale}
             />
             <Menu.Item
               name="FR"
-              active={locale === 'fr'}
+              active={locale === "fr"}
               onClick={handleChangeLocale}
             />
             <Menu.Item
               name="EN"
-              active={locale === 'en'}
+              active={locale === "en"}
               onClick={handleChangeLocale}
             />
           </Menu.Menu>
@@ -95,10 +94,10 @@ const Layout = ({ children, title = "This is the default title", description, }:
       <div className={styles["wrapper"]}>{children}</div>
       <footer className={styles["wrapper"]}>
         <hr />
-        <span>© Adilson Bacelar 2021</span>
+        <span>© Adilson Bacelar {new Date().getFullYear()}</span>
       </footer>
     </div>
-  )
+  );
 };
 
 export default Layout;
