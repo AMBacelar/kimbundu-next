@@ -10,7 +10,7 @@ export type User = {
 };
 
 export type DictionaryEntry = {
-  context: number[];
+  context: string;
   tags: number[];
   diacriticFree: string;
   translations: {
