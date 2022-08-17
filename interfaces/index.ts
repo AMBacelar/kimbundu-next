@@ -23,7 +23,7 @@ export type DictionaryEntry = {
   };
   literalTranslations: { en: string; fr: string; pt: string };
   kimbunduText: string;
-  class: string[];
+  class: string;
   id: string;
 };
 
@@ -34,19 +34,19 @@ export type ClassObject = {
     pt: string;
     fr: string;
     en: string;
-  }
-  prefix: { 
+  };
+  prefix: {
     singular: string;
     plural: string;
-  }
+  };
   singularExample: {
     pt: string;
     fr: string;
     en: string;
-  }
+  };
   pluralExample: {
     pt: string;
     fr: string;
     en: string;
-  }
-}
+  };
+};

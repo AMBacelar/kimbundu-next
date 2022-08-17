@@ -6,15 +6,14 @@ import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import Layout from "../../components/Layout";
 import { buildClass } from "../../helpers/build-class";
 import { DictionaryEntry } from "../../interfaces";
-import firestore from "../../utils/firestore";
+import { getClass } from "../../fetch-data/get-class";
+import { Pagination } from "../../components/pagination";
+import paginationStyles from "../../components/pagination/pagination.module.scss";
 
 type Props = {
   results?: DictionaryEntry[];
   term: string;
-  prev: string;
-  next: string;
-  showPrevious: boolean;
-  showNext: boolean;
+  numPages: number;
 };
 
 const i18n = {
@@ -30,18 +29,27 @@ const i18n = {
   },
 };
 
-const ClassIndexPage = ({
-  results,
-  term,
-  showPrevious,
-  showNext,
-  prev,
-  next,
-}: Props) => {
+const ClassIndexPage = ({ results, term, numPages }: Props) => {
   const router = useRouter();
-  const { locale } = router;
+  const { locale, query } = router;
+  const { targetPage } = query;
   const t = (stringPath: string) => i18n[stringPath][locale];
   const classObject = buildClass(term);
+
+  const paginationComponent: React.FC<{ page: number }> = ({ page }) => {
+    if (
+      (page as any) === "..." ||
+      page == parseInt(targetPage as string) ||
+      (page === 1 && targetPage === undefined)
+    ) {
+      return <a className={paginationStyles["pagination-button"]}>{page}</a>;
+    }
+    return (
+      <Link passHref href={`/classes/${term}?targetPage=${page}`}>
+        <a className={paginationStyles["pagination-button"]}>{page}</a>
+      </Link>
+    );
+  };
 
   return (
     <Layout
@@ -52,16 +60,11 @@ const ClassIndexPage = ({
       {results.map((result) => (
         <DictionaryEntryComponent key={result.id} entry={result} />
       ))}
-      {showPrevious && (
-        <Link passHref href={`/classes/${term}?endBefore=${prev}`}>
-          <a>Prev</a>
-        </Link>
-      )}
-      {showNext && (
-        <Link passHref href={`/classes/${term}?startAt=${next}`}>
-          <a>Next</a>
-        </Link>
-      )}
+      <Pagination
+        numPages={numPages}
+        currentPage={targetPage ? parseInt(targetPage as string) : 1}
+        CustomPaginationComponent={paginationComponent}
+      />
     </Layout>
   );
 };
@@ -70,106 +73,17 @@ export default ClassIndexPage;
 
 export async function getServerSideProps({ params, query }) {
   const potentialClass = params.classIndex;
-  const { endBefore, startAt } = query;
-  const dictionaryRef = firestore.collection("dictionary");
-  let snapshot;
 
-  let showPrevious = false;
-  let prev;
-  let showNext = false;
-  let next;
-
-  const results = [];
-
-  if (endBefore) {
-    snapshot = await dictionaryRef
-      .where("class", "array-contains", potentialClass)
-      .orderBy("diacriticFree")
-      .endBefore(endBefore)
-      .limit(11)
-      .get();
-
-    if (snapshot.empty) {
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      };
-    }
-
-    snapshot.forEach((doc) => {
-      results.push({ ...doc.data(), id: doc.id });
-    });
-
-    if (results.length === 11) {
-      showPrevious = true;
-      showNext = true;
-      prev = results[0].id;
-      next = results[results.length - 1].id;
-      results.shift();
-      results.pop();
-    }
-  } else if (startAt) {
-    showPrevious = true;
-
-    snapshot = await dictionaryRef
-      .where("class", "array-contains", potentialClass)
-      .orderBy("diacriticFree")
-      .startAt(startAt)
-      .limit(11)
-      .get();
-
-    if (snapshot.empty) {
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      };
-    }
-
-    snapshot.forEach((doc) => {
-      results.push({ ...doc.data(), id: doc.id });
-    });
-    prev = results[0].id;
-    if (results.length === 11) {
-      showNext = true;
-      next = results[results.length - 1].id;
-      results.pop();
-    }
-  } else {
-    snapshot = await dictionaryRef
-      .where("class", "array-contains", potentialClass)
-      .orderBy("diacriticFree")
-      .limit(11)
-      .get();
-    if (snapshot.empty) {
-      return {
-        redirect: {
-          destination: "/",
-          permanent: false,
-        },
-      };
-    }
-    snapshot.forEach((doc) => {
-      results.push({ ...doc.data(), id: doc.id });
-    });
-    if (results.length === 11) {
-      showNext = true;
-      next = results[results.length - 1].id;
-      results.pop();
-    }
-  }
+  const { results, numPages } = await getClass(
+    potentialClass,
+    query.targetPage || 0
+  );
 
   return {
     props: {
       term: params.classIndex,
       results,
-      showPrevious,
-      showNext,
-      prev: prev || null,
-      next: next || null,
+      numPages,
     }, // will be passed to the page component as props
   };
 }
