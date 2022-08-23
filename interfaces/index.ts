@@ -24,7 +24,6 @@ export type DictionaryEntry = {
   literalTranslations: { en: string; fr: string; pt: string };
   kimbunduText: string;
   class: string;
-  id: string;
 };
 
 export type ClassObject = {
