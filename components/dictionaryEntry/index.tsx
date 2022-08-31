@@ -58,10 +58,11 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
   const { locale } = router;
   const t = (stringPath: string) => i18n[stringPath][locale];
   const desinationUrl = `/entry/${entry.diacriticFree}`;
+  // console.log(entry);
   return (
     <div className={styles["wrapper"]}>
       <Card fluid>
-        {entry.class.length > 0 && <ClassBadge classNumber={entry.class} />}
+        {entry.class && <ClassBadge classNumber={entry.class} />}
         <Card.Content>
           <Card.Header>
             <Link passHref href={desinationUrl}>

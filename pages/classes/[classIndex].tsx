@@ -10,12 +10,6 @@ import { getClass } from "../../fetch-data/get-class";
 import { Pagination } from "../../components/pagination";
 import paginationStyles from "../../components/pagination/pagination.module.scss";
 
-type Props = {
-  results?: DictionaryEntry[];
-  term: string;
-  numPages: number;
-};
-
 const i18n = {
   errorTitle: {
     en: "Error | Online Kimbundu dictionary",
@@ -29,26 +23,24 @@ const i18n = {
   },
 };
 
-const ClassIndexPage = ({ results, term, numPages }: Props) => {
+const ClassIndexPage = ({
+  results,
+  term,
+  numPages,
+}: {
+  results?: DictionaryEntry[];
+  term: string;
+  numPages: number;
+}) => {
   const router = useRouter();
   const { locale, query } = router;
   const { targetPage } = query;
   const t = (stringPath: string) => i18n[stringPath][locale];
   const classObject = buildClass(term);
 
-  const paginationComponent: React.FC<{ page: number }> = ({ page }) => {
-    if (
-      (page as any) === "..." ||
-      page == parseInt(targetPage as string) ||
-      (page === 1 && targetPage === undefined)
-    ) {
-      return <a className={paginationStyles["pagination-button"]}>{page}</a>;
-    }
-    return (
-      <Link passHref href={`/classes/${term}?targetPage=${page}`}>
-        <a className={paginationStyles["pagination-button"]}>{page}</a>
-      </Link>
-    );
+  const onPageChange = (e, data) => {
+    e.preventDefault();
+    router.push(`/classes/${term}?targetPage=${data.activePage}`);
   };
 
   return (
@@ -57,13 +49,13 @@ const ClassIndexPage = ({ results, term, numPages }: Props) => {
         "baseTitle"
       )}`}
     >
-      {results.map((result) => (
-        <DictionaryEntryComponent key={result.id} entry={result} />
+      {results.map((result, i) => (
+        <DictionaryEntryComponent key={i} entry={result} />
       ))}
       <Pagination
         numPages={numPages}
         currentPage={targetPage ? parseInt(targetPage as string) : 1}
-        CustomPaginationComponent={paginationComponent}
+        onPageChange={onPageChange}
       />
     </Layout>
   );

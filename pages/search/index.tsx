@@ -4,12 +4,11 @@ import { DictionaryEntry } from "../../interfaces";
 import { SearchBar } from "../../components/searchBar";
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import { useRouter } from "next/router";
-
-type Props = {
-  results?: DictionaryEntry[];
-  term: string;
-  destination: string;
-};
+import Typesense from "typesense";
+import dot from "dot-object";
+import { Pagination } from "../../components/pagination";
+import paginationStyles from "../../components/pagination/pagination.module.scss";
+import Link from "next/link";
 
 const i18n = {
   baseTitle: {
@@ -29,9 +28,18 @@ const i18n = {
   },
 };
 
-const SearchResultPage = ({ results, term, destination }: Props) => {
+const SearchResultPage = ({
+  results,
+  term,
+  numPages,
+}: {
+  results?: DictionaryEntry[];
+  term: string;
+  numPages: number;
+}) => {
   const router = useRouter();
-  const { locale } = router;
+  const { locale, query } = router;
+  const { targetPage } = query;
   const t = (stringPath: string, stringReplace?: string) => {
     let result = i18n[stringPath][locale];
     if (stringReplace) {
@@ -40,17 +48,27 @@ const SearchResultPage = ({ results, term, destination }: Props) => {
     return result;
   };
 
+  const onPageChange = (e, data) => {
+    e.preventDefault();
+    router.push(`/search?term=${term}&targetPage=${data.activePage}`);
+  };
+
   return (
     <Layout title={`${term} | ${t("baseTitle")}`}>
       <h1>{t("searchResult", term)}</h1>
-      <SearchBar searchTerm={term} destination={destination} />
+      <SearchBar searchTerm={term} />
       {results.length === 0 ? (
         <div>{t("noResults")}</div>
       ) : (
-        results.map((result) => (
-          <DictionaryEntryComponent key={result.id} entry={result} />
+        results.map((result, i) => (
+          <DictionaryEntryComponent key={i} entry={result} />
         ))
       )}
+      <Pagination
+        numPages={numPages}
+        currentPage={targetPage ? parseInt(targetPage as string) : 1}
+        onPageChange={onPageChange}
+      />
     </Layout>
   );
 };
@@ -67,37 +85,34 @@ export async function getServerSideProps({ query }) {
     };
   }
 
-  let field;
-  switch (query.destination) {
-    case "kimbundu":
-      field = "diacriticFree";
-      break;
-    case "english":
-      field = "translations.en_df";
-      break;
-    case "portuguese":
-      field = "translations.pt_df";
-      break;
-    case "french":
-      field = "translations.fr_df";
-      break;
-  }
-  // const potentialWord = params.kimbunduText;
-  const dictionaryRef = firestore.collection("dictionary");
-  const snapshot = await dictionaryRef.where(field, "==", query.term).get();
-  const results = [];
-  if (snapshot.empty) {
-    console.log("No matching documents.");
-  } else {
-    snapshot.forEach((doc) => {
-      results.push({ ...doc.data(), id: doc.id });
-    });
-  }
+  const client = new Typesense.Client({
+    nodes: [
+      {
+        host: process.env.TYPESENSE_HOST,
+        port: Number(process.env.TYPESENSE_PORT),
+        protocol: process.env.TYPESENSE_PROTOCOL,
+      },
+    ],
+    apiKey: process.env.TYPESENSE_API_KEY,
+  });
+
+  const page = query.targetPage || 1;
+
+  const response = await client.collections("entries").documents().search({
+    query_by:
+      "translations.en,translations.pt,translations.fr,literalTranslations.en,literalTranslations.fr,literalTranslations.pt,kimbunduText",
+    q: query.term,
+    page,
+  });
+
+  const results = response.hits.map((hit) => dot.object(hit.document));
+  const numPages = Math.ceil(response.found / response.request_params.per_page);
+
   return {
     props: {
-      term: query.term,
-      destination: query.destination,
+      term: response.request_params.q,
       results,
+      numPages,
     }, // will be passed to the page component as props
   };
 }

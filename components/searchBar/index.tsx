@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 
 type Props = {
   searchTerm?: string;
-  destination?: string;
   disabled?: boolean;
 };
 
@@ -51,16 +50,15 @@ const i18n = {
   },
 };
 
-export const SearchBar = ({ searchTerm, destination, disabled }: Props) => {
+export const SearchBar = ({ searchTerm, disabled }: Props) => {
   const [searchText, setSearchText] = useState(searchTerm || "");
-  const [searchField, setSearchField] = useState(destination || "kimbundu");
 
   const router = useRouter();
   const { locale, query } = router;
   const t = (stringPath: string) => i18n[stringPath][locale];
 
   const onSubmit = () => {
-    let url = `/search?term=${searchText}&destination=${searchField}`;
+    let url = `/search?term=${searchText}`;
     router.push(url);
   };
   return (
@@ -77,37 +75,6 @@ export const SearchBar = ({ searchTerm, destination, disabled }: Props) => {
             onChange={(_, { value }) => setSearchText(value)}
           />
           <Form.Button disabled={disabled} aria-label="Search" icon="search" />
-        </Form.Group>
-        <Form.Group inline>
-          <label>{t("searchField")}</label>
-          <Form.Field
-            control={Radio}
-            label={t("kimSearch")}
-            value="kimbundu"
-            checked={searchField === "kimbundu"}
-            onChange={() => setSearchField("kimbundu")}
-          />
-          <Form.Field
-            control={Radio}
-            label={t("ptSearch")}
-            value="portuguese"
-            checked={searchField === "portuguese"}
-            onChange={() => setSearchField("portuguese")}
-          />
-          <Form.Field
-            control={Radio}
-            label={t("frSearch")}
-            value="french"
-            checked={searchField === "french"}
-            onChange={() => setSearchField("french")}
-          />
-          <Form.Field
-            control={Radio}
-            label={t("enSearch")}
-            value="english"
-            checked={searchField === "english"}
-            onChange={() => setSearchField("english")}
-          />
         </Form.Group>
       </Form>
     </>

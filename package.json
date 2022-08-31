@@ -8,6 +8,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "dot-object": "^2.1.4",
     "firebase": "^9.4.1",
     "firebase-admin": "^10.0.0",
     "next": "latest",
@@ -15,9 +16,11 @@
     "react-dom": "^17.0.2",
     "sass": "^1.43.4",
     "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^2.0.4"
+    "semantic-ui-react": "^2.0.4",
+    "typesense": "^1.4.0"
   },
   "devDependencies": {
+    "@types/dot-object": "^2.1.2",
     "@types/node": "^12.12.21",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
