@@ -54,12 +54,24 @@ const Layout = ({
         <meta property="og:url" content={`${hostname}${router.asPath}`} />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        {/* <meta property="og:image" content={image} /> */}
+        <meta
+          property="og:image"
+          content="/angola-flag-button-square-icon-256.png"
+        />
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content={`${hostname}${router.asPath}`} />
         <meta property="twitter:title" content={title} />
         <meta property="twitter:description" content={trueDescription} />
-        {/* <meta property="twitter:image" content={image} /> */}
+        <link rel="manifest" href="/manifest.json" />
+        {/* this sets logo in Apple smatphones. */}
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* this sets the color of url bar in Apple smatphones */}
+        <meta name="apple-mobile-web-app-status-bar" content="#90cdf4" />
+        <meta
+          property="twitter:image"
+          content="/angola-flag-button-square-icon-256.png"
+        />
+        <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="alternate" hrefLang="en" href={`${hostname}en${asPath}`} />
         <link rel="alternate" hrefLang="fr" href={`${hostname}fr${asPath}`} />
         <link rel="alternate" hrefLang="pt" href={`${hostname}pt${asPath}`} />
