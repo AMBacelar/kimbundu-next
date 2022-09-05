@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import type { DictionaryEntry } from "../../interfaces";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Card, Flag, Message } from "semantic-ui-react";
 import styles from "./styles.module.scss";
 import { ClassBadge } from "../classBadge";
+import { getTagObject } from "../../helpers/tag-parser";
+import { getTag } from "../../fetch-data/get-tag";
 
 type Props = {
   entry: DictionaryEntry;
@@ -20,6 +22,16 @@ const i18n = {
     en: "Diacritic free: ",
     fr: "Sans signe diacritique : ",
     pt: "Sem diacríticos: ",
+  },
+  tag: {
+    en: "Tags: ",
+    fr: "Tags: ",
+    pt: "Etiqueta: ",
+  },
+  otherWordsWithTag: {
+    en: "other words with the tag",
+    fr: "d'autres mots avec le tag",
+    pt: "outras palavras com a etiqueta",
   },
   ptTrans: {
     en: "Portuguese Translation: ",
@@ -53,12 +65,61 @@ const i18n = {
   },
 };
 
+const RelatedWords = ({ tag, locale }) => {
+  const [relatedWords, setRelatedWords] = useState([]);
+  useEffect(() => {
+    (async () => {
+      const words = await getTag(tag.index, 1);
+      const relatedWords = words.results.map(
+        ({ kimbunduText, diacriticFree }) => ({ kimbunduText, diacriticFree })
+      );
+      setRelatedWords(relatedWords);
+    })();
+  }, []);
+  const t = (stringPath: string) => i18n[stringPath][locale];
+
+  if (relatedWords.length === 0) return null;
+
+  const renderedWords = relatedWords.map((word, i) => (
+    <Link passHref href={`/word/${word.diacriticFree}`}>
+      <em>
+        <a>{` ${word.kimbunduText}`}</a>
+        {i !== relatedWords.length - 1 && ","}
+      </em>
+    </Link>
+  ));
+
+  return (
+    <Card fluid key={tag.index}>
+      <Card.Content>
+        <p>
+          {`${t("otherWordsWithTag")}`} {tag[locale]}:
+        </p>
+        <div> {renderedWords}</div>
+      </Card.Content>
+    </Card>
+  );
+};
+
 export const DictionaryEntryComponent = ({ entry }: Props) => {
   const router = useRouter();
   const { locale } = router;
   const t = (stringPath: string) => i18n[stringPath][locale];
-  const desinationUrl = `/entry/${entry.diacriticFree}`;
-  // console.log(entry);
+  const desinationUrl = `/word/${entry.diacriticFree}`;
+
+  const tagList = entry.tags.map((tag) => {
+    const tagObject = getTagObject(tag);
+    return <a key={tagObject.index}> {tagObject[locale]}</a>;
+  });
+
+  const relatedWords = entry.tags.map((tag) => {
+    const tagObject = getTagObject(tag);
+    // const { results } = await getTag(tag, 1);
+    return (
+      <RelatedWords key={tagObject.index} tag={tagObject} locale={locale} />
+    );
+  });
+
   return (
     <div className={styles["wrapper"]}>
       <Card fluid>
@@ -70,6 +131,12 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
             </Link>
           </Card.Header>
           <Card.Meta>{`${t("diaFree")}${entry.diacriticFree}`}</Card.Meta>
+          {entry.tags.length > 0 && (
+            <Card.Meta>
+              {`${t("tag")}`}
+              {tagList}
+            </Card.Meta>
+          )}
           <Card.Description>
             <Message>
               <Flag name="pt" />
@@ -95,9 +162,9 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
             </Message>
           </Card.Description>
         </Card.Content>
+        {entry.tags.length > 0 && relatedWords}
       </Card>
-      {/* <p>context:</p>
-      <p>tags:</p> */}
+      {/* <p>context:</p>*/}
     </div>
   );
 };
