@@ -1,4 +1,4 @@
-const tagMap = [
+export const tagMap = [
   {
     index: 0,
     en: "Adjective",

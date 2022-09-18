@@ -1,13 +1,13 @@
 import { useRouter } from "next/router";
+import Link from "next/link";
 import React from "react";
 
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import Layout from "../../components/Layout";
-import { buildClass } from "../../helpers/build-class";
 import { DictionaryEntry } from "../../interfaces";
-import { getClass } from "../../fetch-data/get-class";
 import { Pagination } from "../../components/pagination";
-import { ClassCard } from "../../components/classCard";
+import { getTagObject } from "../../helpers/tag-parser";
+import { getTag } from "../../fetch-data/get-tag";
 
 const i18n = {
   errorTitle: {
@@ -22,7 +22,7 @@ const i18n = {
   },
 };
 
-const ClassIndexPage = ({
+const TagIndexPage = ({
   results,
   term,
   numPages,
@@ -35,20 +35,16 @@ const ClassIndexPage = ({
   const { locale, query } = router;
   const { targetPage } = query;
   const t = (stringPath: string) => i18n[stringPath][locale];
-  const classObject = buildClass(term);
+  const tagObject = getTagObject(Number(term));
 
   const onPageChange = (e, data) => {
     e.preventDefault();
-    router.push(`/classes/${term}?targetPage=${data.activePage}`);
+    router.push(`/tags/${term}?targetPage=${data.activePage}`);
   };
 
   return (
-    <Layout
-      title={`${classObject.display} - ${classObject.description[locale]} | ${t(
-        "baseTitle"
-      )}`}
-    >
-      <ClassCard classIndex={term} />
+    <Layout title={`${tagObject[locale]} | ${t("baseTitle")}`}>
+      {/* <ClassCard tagIndex={term} /> */}
       {results.map((result, i) => (
         <DictionaryEntryComponent key={i} entry={result} />
       ))}
@@ -61,19 +57,19 @@ const ClassIndexPage = ({
   );
 };
 
-export default ClassIndexPage;
+export default TagIndexPage;
 
 export async function getServerSideProps({ params, query }) {
-  const potentialClass = params.classIndex;
+  const potentialTag = Number(params.tagIndex);
 
-  const { results, numPages } = await getClass(
-    potentialClass,
+  const { results, numPages } = await getTag(
+    potentialTag,
     query.targetPage || 0
   );
 
   return {
     props: {
-      term: params.classIndex,
+      term: params.tagIndex,
       results,
       numPages,
     }, // will be passed to the page component as props

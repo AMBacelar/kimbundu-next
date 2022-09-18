@@ -1,5 +1,4 @@
 import Layout from "../../components/Layout";
-import firestore from "../../utils/firestore";
 import { DictionaryEntry } from "../../interfaces";
 import { SearchBar } from "../../components/searchBar";
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
@@ -7,8 +6,6 @@ import { useRouter } from "next/router";
 import Typesense from "typesense";
 import dot from "dot-object";
 import { Pagination } from "../../components/pagination";
-import paginationStyles from "../../components/pagination/pagination.module.scss";
-import Link from "next/link";
 
 const i18n = {
   baseTitle: {

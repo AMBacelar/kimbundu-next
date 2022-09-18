@@ -81,7 +81,7 @@ const RelatedWords = ({ tag, locale }) => {
   if (relatedWords.length === 0) return null;
 
   const renderedWords = relatedWords.map((word, i) => (
-    <Link passHref href={`/word/${word.diacriticFree}`}>
+    <Link key={i} passHref href={`/word/${word.diacriticFree}`}>
       <em>
         <a>{` ${word.kimbunduText}`}</a>
         {i !== relatedWords.length - 1 && ","}
@@ -93,7 +93,11 @@ const RelatedWords = ({ tag, locale }) => {
     <Card fluid key={tag.index}>
       <Card.Content>
         <p>
-          {`${t("otherWordsWithTag")}`} {tag[locale]}:
+          {`${t("otherWordsWithTag")}`}{" "}
+          <Link passHref href={`/tags/${tag.index}`}>
+            <a>{tag[locale]}</a>
+          </Link>
+          :
         </p>
         <div> {renderedWords}</div>
       </Card.Content>
@@ -109,12 +113,15 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
 
   const tagList = entry.tags.map((tag) => {
     const tagObject = getTagObject(tag);
-    return <a key={tagObject.index}> {tagObject[locale]}</a>;
+    return (
+      <Link passHref href={`/tags/${tagObject.index}`}>
+        <a>{tagObject[locale]}</a>
+      </Link>
+    );
   });
 
   const relatedWords = entry.tags.map((tag) => {
     const tagObject = getTagObject(tag);
-    // const { results } = await getTag(tag, 1);
     return (
       <RelatedWords key={tagObject.index} tag={tagObject} locale={locale} />
     );
