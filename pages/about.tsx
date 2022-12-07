@@ -6,7 +6,7 @@ const i18n = {
     en: "This is the about page",
     fr: "Ceci est la page à propos",
     pt: "Esta é a página sobre",
-    kmb: "O site yiyi ya lungu n'etu"
+    kmb: "O site yiyi ya lungu n'etu",
   },
   body: {
     en: "This is an ongoing project to help build a resource that will help the decendants of the Ambundu people learn and keep the Kimbundu language alive",
@@ -24,7 +24,7 @@ const i18n = {
     en: "About | 🇦🇴 Online Kimbundu dictionary 🇦🇴",
     fr: "À propos | 🇦🇴 Dictionnaire Kimbundu en ligne 🇦🇴",
     pt: "Sobre Nós | 🇦🇴 Dicionário Kimbundu Online 🇦🇴",
-    kmb: "Kulunga ni Etu | Dicionário ya Kimbundu Online",
+    kmb: "Kulunga ni Etu | 🇦🇴 Dicionário ya Kimbundu Online 🇦🇴",
   },
 };
 
