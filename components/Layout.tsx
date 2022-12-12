@@ -23,6 +23,11 @@ const i18n = {
     fr: "Accueil",
     pt: "Pagina inicial",
   },
+  translate: {
+    en: "Translate [beta]",
+    fr: "Translate [beta]",
+    pt: "Translate [beta]",
+  },
   defaultDescription: {
     en: "(Soon to be) The first place you should look to learn Kimbundu",
     fr: "(Bientôt) Le premier endroit où vous devriez chercher pour apprendre le Kimbundu",
@@ -83,6 +88,12 @@ const Layout = ({
           </Link>
           <Link passHref href="/about">
             <Menu.Item active={pathname === "/about"} name={t("about")} />
+          </Link>
+          <Link passHref href="/translate">
+            <Menu.Item
+              active={pathname === "/translate"}
+              name={t("translate")}
+            />
           </Link>
           <Menu.Menu position="right">
             <Menu.Item

@@ -6,7 +6,10 @@
 - [x] bible sourced in kimbundu
 - [x] tags displayed on entries
 - [x] tags page
+- [x] Implement the initial NLP translation implementation
+- [x] What the hell is NLP(Natural Language Processing)? And How can it be of use for this project?
 - [ ] tags index page
+- [ ] migrate current dictionary into new data structure where each word has multiple definitions, on one card. This will make the entry page make more sense.
 - [ ] Kimbundu alphabet and pronounciation
 - [ ] history of Kimbundu people
 - [ ] migrate to monorepo
@@ -15,7 +18,6 @@
 - [ ] "Kimbundu basics" page (numbers, things, greetings etc.)
 - [ ] analytics proxy to avoid adblock $$$
 - [ ] Browser Extension?
-- [ ] What the hell is NLP(Natural Language Processing)? And How can it be of use for this project?
 - [ ] browse section
 - [ ] better word/phrase discovery
 - [ ] full phrase/sentence search/translation

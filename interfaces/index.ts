@@ -26,6 +26,27 @@ export type DictionaryEntry = {
   class: string;
 };
 
+export type NewDictionaryEntry = {
+  kimbunduText: string;
+  diacriticFree: string;
+  definitions: Definition[];
+};
+
+export type Definition = {
+  context: string;
+  tags: number[];
+  translations: {
+    en: string;
+    en_df: string;
+    pt: string;
+    pt_df: string;
+    fr: string;
+    fr_df: string;
+  };
+  literalTranslations: { en: string; fr: string; pt: string };
+  class: string;
+};
+
 export type ClassObject = {
   index: number;
   display: string;
