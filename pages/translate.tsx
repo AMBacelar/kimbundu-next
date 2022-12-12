@@ -30,6 +30,7 @@ const TranslationPage = () => {
   const router = useRouter();
   const [inputText, setInputText] = useState<string | number>("");
   const [response, setResponse] = useState("");
+  const [error, setError] = useState(false);
   const { locale } = router;
   const [socket, setSocket] = useState<WebSocket>(null);
   const t = (path: string) => i18n[path][locale];
@@ -43,10 +44,26 @@ const TranslationPage = () => {
     socket.addEventListener("message", ({ data }) => {
       setResponse(data);
     });
+
+    socket.addEventListener("error", (event) => {
+      console.log("WebSocket error: ", event);
+      setError(true);
+    });
+
+    socket.addEventListener("disconnect", function () {
+      console.log("Socket disconnected");
+    });
+    return () => {
+      socket.close();
+    };
   }, []);
 
   const onSubmit = () => {
-    socket.send(inputText as string);
+    try {
+      socket.send(inputText as string);
+    } catch (error) {
+      console.log("failed to send message");
+    }
   };
 
   return (
@@ -65,12 +82,17 @@ const TranslationPage = () => {
             onChange={(_, { value }) => setInputText(value)}
           />
         </Form.Group>
-        <Form.Button aria-label="Search" content="translate" icon="language" />
+        <Form.Button
+          disabled={!inputText}
+          aria-label="Search"
+          content="translate"
+          icon="language"
+        />
       </Form>
       {response && (
         <Message>
           <p>
-            {"translation: "}
+            {"current attempt at translation: "}
             <em>
               <strong>{response}</strong>
             </em>
@@ -79,6 +101,13 @@ const TranslationPage = () => {
           <p>
             <strong>Disclaimer:</strong> this is of course, a work in progress,
             and over time, with more data, the accuracy will improve
+          </p>
+        </Message>
+      )}
+      {error && (
+        <Message error>
+          <p>
+            <strong>Error:</strong> This service is currently not available
           </p>
         </Message>
       )}
