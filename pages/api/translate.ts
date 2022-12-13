@@ -12,7 +12,6 @@ const handler = async (req: Request, res: Response) => {
       });
 
       socket.addEventListener("message", ({ data }) => {
-        console.log("message:", data);
         resolve(data);
       });
 
