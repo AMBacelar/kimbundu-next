@@ -1,7 +1,7 @@
 import Layout from "../components/Layout";
 import { useRouter } from "next/router";
 import { Form, Message } from "semantic-ui-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import firebase from "../utils/firebase";
 import { getAnalytics, logEvent } from "firebase/analytics";
@@ -36,8 +36,9 @@ const TranslationPage = () => {
   const [error, setError] = useState(false);
   const { locale } = router;
   const t = (path: string) => i18n[path][locale];
+  const [analytics, setAnalytics] = useState(null);
 
-  const analytics = getAnalytics(firebase);
+  useEffect(() => setAnalytics(getAnalytics(firebase)), []);
 
   const onSubmit = async () => {
     try {

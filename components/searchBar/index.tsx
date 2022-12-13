@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form } from "semantic-ui-react";
 import { useRouter } from "next/router";
 
@@ -60,7 +60,9 @@ export const SearchBar = ({ searchTerm, disabled }: Props) => {
   const { locale, query } = router;
   const t = (stringPath: string) => i18n[stringPath][locale];
 
-  const analytics = getAnalytics(firebase);
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => setAnalytics(getAnalytics(firebase)), []);
 
   const onSubmit = () => {
     logEvent(analytics, "search", { search_term: searchText });
