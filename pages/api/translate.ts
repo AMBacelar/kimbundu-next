@@ -8,7 +8,7 @@ const handler = async (req: Request, res: Response) => {
   const promise = () =>
     new Promise((resolve, reject) => {
       socket.addEventListener("open", () => {
-        socket.send(text);
+        socket.send(text.toLowerCase());
       });
 
       socket.addEventListener("message", ({ data }) => {
