@@ -22,6 +22,7 @@ const handler = async (req: Request, res: Response) => {
     });
   try {
     const response = await promise();
+    socket.close();
     res.send(response);
   } catch (error) {
     console.log("mezzop");
