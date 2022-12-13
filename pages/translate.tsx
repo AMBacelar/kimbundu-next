@@ -75,6 +75,10 @@ const TranslationPage = () => {
       <p>Some tips:</p>
       <ul>
         <li>
+          This model has been trained on about 60% of the English and Kimbundu
+          bible, so there isn't going to be much scope beyond that at this time
+        </li>
+        <li>
           if the response is empty, then the model has little confidence is the
           translation and sends nothing
         </li>
