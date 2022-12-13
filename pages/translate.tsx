@@ -61,6 +61,33 @@ const TranslationPage = () => {
       <p>{t("greeting")}</p>
       <p>{t("body")}</p>
 
+      <Message info>
+        <Message.Header>
+          For the sake of debugging and improvements, I'd be very grateful if
+          you turned adblock off for this site.
+        </Message.Header>
+        <Message.Content>
+          I do not plan to have ads running for the meantime, but it's difficult
+          to fix bugs if I cannot get to the logs
+        </Message.Content>
+      </Message>
+
+      <p>Some tips:</p>
+      <ul>
+        <li>
+          if the response is empty, then the model has little confidence is the
+          translation and sends nothing
+        </li>
+        <li>
+          this model has not been training for long, so the confidence on any
+          response cannot be too high
+        </li>
+        <li>
+          especially in mobile, if the response is empty, try to send it again
+          without the first letter being capitalised
+        </li>
+      </ul>
+
       <Form size="massive" onSubmit={onSubmit}>
         <Form.Group>
           <Form.TextArea
