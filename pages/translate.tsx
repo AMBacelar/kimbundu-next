@@ -1,7 +1,7 @@
 import Layout from "../components/Layout";
 import { useRouter } from "next/router";
 import { Form, Message } from "semantic-ui-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const i18n = {
   greeting: {
@@ -32,37 +32,18 @@ const TranslationPage = () => {
   const [response, setResponse] = useState("");
   const [error, setError] = useState(false);
   const { locale } = router;
-  const [socket, setSocket] = useState<WebSocket>(null);
   const t = (path: string) => i18n[path][locale];
 
-  useEffect(() => {
-    const socket = new WebSocket("ws://34.142.2.30:80/translate");
-    socket.addEventListener("open", () => {
-      setSocket(socket);
-    });
-
-    socket.addEventListener("message", ({ data }) => {
-      setResponse(data);
-    });
-
-    socket.addEventListener("error", (event) => {
-      console.log("WebSocket error: ", event);
-      setError(true);
-    });
-
-    socket.addEventListener("disconnect", function () {
-      console.log("Socket disconnected");
-    });
-    return () => {
-      socket.close();
-    };
-  }, []);
-
-  const onSubmit = () => {
+  const onSubmit = async () => {
     try {
-      socket.send(inputText as string);
+      const response = await fetch("/api/translate", {
+        method: "POST",
+        body: JSON.stringify({ text: inputText }),
+      });
+      const res = await response.text();
+      setResponse(res);
     } catch (error) {
-      console.log("failed to send message");
+      setError(true);
     }
   };
 
