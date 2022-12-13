@@ -37,10 +37,12 @@ const TranslationPage = () => {
   const { locale } = router;
   const t = (path: string) => i18n[path][locale];
   const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => setAnalytics(getAnalytics(firebase)), []);
 
   const onSubmit = async () => {
+    setLoading(true);
     try {
       const response = await fetch("/api/translate", {
         method: "POST",
@@ -52,6 +54,8 @@ const TranslationPage = () => {
       setResponse(res);
     } catch (error) {
       setError(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,7 +107,7 @@ const TranslationPage = () => {
           />
         </Form.Group>
         <Form.Button
-          disabled={!inputText}
+          disabled={!inputText || loading}
           aria-label="Search"
           content="translate"
           icon="language"
