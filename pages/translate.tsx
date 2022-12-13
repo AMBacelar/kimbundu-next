@@ -32,6 +32,7 @@ const i18n = {
 const TranslationPage = () => {
   const router = useRouter();
   const [inputText, setInputText] = useState<string | number>("");
+  const [previousRequest, setPreviousRequest] = useState("");
   const [response, setResponse] = useState("");
   const [error, setError] = useState(false);
   const { locale } = router;
@@ -50,8 +51,13 @@ const TranslationPage = () => {
       });
       const res = await response.text();
 
-      logEvent(analytics, "translation", { inputText, response: res });
+      logEvent(analytics, "translation", {
+        inputText,
+        response: res,
+        raw: `${inputText} -> ${res}`,
+      });
       setResponse(res);
+      setPreviousRequest(inputText as string);
     } catch (error) {
       setError(true);
     } finally {
@@ -107,7 +113,7 @@ const TranslationPage = () => {
           />
         </Form.Group>
         <Form.Button
-          disabled={!inputText || loading}
+          disabled={!inputText || loading || inputText === previousRequest}
           aria-label="Search"
           content="translate"
           icon="language"
