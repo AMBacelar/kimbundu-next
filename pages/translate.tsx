@@ -3,6 +3,9 @@ import { useRouter } from "next/router";
 import { Form, Message } from "semantic-ui-react";
 import { useState } from "react";
 
+import firebase from "../utils/firebase";
+import { getAnalytics, logEvent } from "firebase/analytics";
+
 const i18n = {
   greeting: {
     en: "This feature is still in beta. And the uptime will be shared between training and decoding",
@@ -34,6 +37,8 @@ const TranslationPage = () => {
   const { locale } = router;
   const t = (path: string) => i18n[path][locale];
 
+  const analytics = getAnalytics(firebase);
+
   const onSubmit = async () => {
     try {
       const response = await fetch("/api/translate", {
@@ -41,6 +46,8 @@ const TranslationPage = () => {
         body: JSON.stringify({ text: inputText }),
       });
       const res = await response.text();
+
+      logEvent(analytics, "translation", { inputText, response: res });
       setResponse(res);
     } catch (error) {
       setError(true);
