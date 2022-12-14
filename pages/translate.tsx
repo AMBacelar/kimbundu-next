@@ -42,26 +42,30 @@ const TranslationPage = () => {
 
   useEffect(() => setAnalytics(getAnalytics(firebase)), []);
 
-  const onSubmit = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/translate", {
-        method: "POST",
-        body: JSON.stringify({ text: inputText }),
-      });
-      const res = await response.text();
+  const training = true;
 
-      logEvent(analytics, "translation", {
-        inputText,
-        response: res,
-        raw: `${inputText} -> ${res}`,
-      });
-      setResponse(res);
-      setPreviousRequest(inputText as string);
-    } catch (error) {
-      setError(true);
-    } finally {
-      setLoading(false);
+  const onSubmit = async () => {
+    if (!training) {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/translate", {
+          method: "POST",
+          body: JSON.stringify({ text: inputText }),
+        });
+        const res = await response.text();
+
+        logEvent(analytics, "translation", {
+          inputText,
+          response: res,
+          raw: `${inputText} -> ${res}`,
+        });
+        setResponse(res);
+        setPreviousRequest(inputText as string);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -102,6 +106,19 @@ const TranslationPage = () => {
         </li>
       </ul>
 
+      <Message error>
+        <Message.Header>
+          The translator service is currently down so that resources can go into
+          training
+        </Message.Header>
+        <Message.Content>
+          please keep note of updates on{" "}
+          <a href="https://twitter.com/KimbunduOnline">
+            the official twitter for this project
+          </a>
+        </Message.Content>
+      </Message>
+
       <Form size="massive" onSubmit={onSubmit}>
         <Form.Group>
           <Form.TextArea
@@ -109,11 +126,14 @@ const TranslationPage = () => {
             placeholder={"english text in here..."}
             name="searchText"
             value={inputText}
+            disabled={training}
             onChange={(_, { value }) => setInputText(value)}
           />
         </Form.Group>
         <Form.Button
-          disabled={!inputText || loading || inputText === previousRequest}
+          disabled={
+            !inputText || loading || inputText === previousRequest || training
+          }
           aria-label="Search"
           content="translate"
           icon="language"
