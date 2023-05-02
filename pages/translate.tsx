@@ -108,8 +108,9 @@ const TranslationPage = () => {
 
       <Message error>
         <Message.Header>
-          The translator service is currently down so that resources can go into
-          training
+          The translator service is currently down, the developer is currently
+          procuring text and paying for text to be made to add to the content
+          that can be used to train the model
         </Message.Header>
         <Message.Content>
           please keep note of updates on{" "}
