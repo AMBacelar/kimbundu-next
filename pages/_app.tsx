@@ -6,7 +6,7 @@ import "semantic-ui-css/semantic.min.css";
 import firebase from "../utils/firebase";
 import { getAnalytics, logEvent } from "firebase/analytics";
 
-import EntryPlaceholder from "../components/entryPlaceholder";
+import { Analytics } from "@vercel/analytics/react";
 import LoadingEntries from "./loadingEntries";
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -47,7 +47,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   if (loading) return <LoadingEntries />;
 
-  return <Component {...pageProps} loading={loading} />;
+  return (
+    <>
+      <Component {...pageProps} loading={loading} />
+      <Analytics />
+    </>
+  );
 }
 
 export default MyApp;
