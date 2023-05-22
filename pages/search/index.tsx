@@ -73,7 +73,7 @@ const SearchResultPage = ({
 export default SearchResultPage;
 
 export async function getServerSideProps({ query, res }) {
-  res.removeHeader("Cache-Control");
+  res.setHeader("Cache-Control", "public");
   if (!query.term) {
     return {
       redirect: {
