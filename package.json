@@ -8,6 +8,7 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.0.0",
     "dot-object": "^2.1.4",
     "firebase": "^9.4.1",
     "firebase-admin": "^10.0.0",
