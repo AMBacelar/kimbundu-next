@@ -16,16 +16,6 @@ const i18n = {
   },
 };
 
-export async function getServerSideProps({ res }) {
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=10, stale-while-revalidate=59"
-  );
-  return {
-    props: {},
-  };
-}
-
 const IndexPage = () => {
   const router = useRouter();
   const { locale } = router;
