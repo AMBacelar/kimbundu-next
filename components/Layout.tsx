@@ -117,6 +117,7 @@ const Layout = ({
       <div className={styles["wrapper"]}>{children}</div>
       <footer className={styles["wrapper"]}>
         <hr />
+        {' '}
         <span>© Adilson Bacelar {new Date().getFullYear()}</span>
       </footer>
     </div>
