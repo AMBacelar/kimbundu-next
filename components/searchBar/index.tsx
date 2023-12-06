@@ -76,6 +76,7 @@ export const SearchBar = ({ searchTerm, disabled }: Props) => {
         <Form.Group>
           <Form.Input
             type="text"
+            size="large"
             placeholder={t("searchTerm")}
             name="searchText"
             value={searchText}
