@@ -89,12 +89,12 @@ const Layout = ({
           <Link passHref href="/about">
             <Menu.Item active={pathname === "/about"} name={t("about")} />
           </Link>
-          <Link passHref href="/translate">
+          {/* <Link passHref href="/translate">
             <Menu.Item
               active={pathname === "/translate"}
               name={t("translate")}
             />
-          </Link>
+          </Link> */}
           <Menu.Menu position="right">
             <Menu.Item
               name="PT"
@@ -117,6 +117,7 @@ const Layout = ({
       <div className={styles["wrapper"]}>{children}</div>
       <footer className={styles["wrapper"]}>
         <hr />
+        {' '}
         <span>© Adilson Bacelar {new Date().getFullYear()}</span>
       </footer>
     </div>
