@@ -83,7 +83,12 @@ export const SearchBar = ({ searchTerm, disabled }: Props) => {
             disabled={disabled}
             onChange={(_, { value }) => setSearchText(value)}
           />
-          <Form.Button disabled={disabled} aria-label="Search" icon="search" />
+          <Form.Button
+            disabled={disabled}
+            size="large"
+            aria-label="Search"
+            icon="search"
+          />
         </Form.Group>
       </Form>
     </>
