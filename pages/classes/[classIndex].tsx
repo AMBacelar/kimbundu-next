@@ -1,7 +1,4 @@
 import { useRouter } from "next/router";
-import React from "react";
-import type { PaginationProps } from "semantic-ui-react";
-
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import Layout from "../../components/Layout";
 import { buildClass } from "../../helpers/build-class";
@@ -38,12 +35,7 @@ const ClassIndexPage = ({
   const t = (stringPath: string) => i18n[stringPath][locale];
   const classObject = buildClass(term);
 
-  const onPageChange = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    data: PaginationProps
-  ) => {
-    e.preventDefault();
-    const page = Number(data.activePage) || 1;
+  const onPageChange = (page: number) => {
     router.push(`/classes/${term}?targetPage=${page}`);
   };
 

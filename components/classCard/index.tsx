@@ -1,8 +1,17 @@
-import React from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Card, Table } from "semantic-ui-react";
-import styles from "./styles.module.scss";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
 import { buildClass } from "../../helpers/build-class";
 
 type Props = {
@@ -35,33 +44,37 @@ export const ClassCard = ({ classIndex }: Props) => {
   const classObject = buildClass(classIndex);
 
   return (
-    <div className={styles["wrapper"]}>
-      <Card fluid>
-        <Card.Content>
-          <Link href={desinationUrl}>
-            <Card.Header>{classObject.display}</Card.Header>
-          </Link>
-          <Card.Meta>{classObject.description[locale]}</Card.Meta>
-          <Card.Description>
-            {t("prefix")}
-            <Table basic="very" columns={2}>
-              <Table.Body>
-                <Table.Row>
-                  <Table.Cell>{t("singular")}</Table.Cell>
-                  <Table.Cell>{t("plural")}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>{classObject.prefix.singular}</Table.Cell>
-                  <Table.Cell>{classObject.prefix.plural}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                  <Table.Cell>{classObject.singularExample[locale]}</Table.Cell>
-                  <Table.Cell>{classObject.pluralExample[locale]}</Table.Cell>
-                </Table.Row>
-              </Table.Body>
-            </Table>
-          </Card.Description>
-        </Card.Content>
+    <div className="my-5 max-w-2xl">
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <Link href={desinationUrl} className="hover:underline">
+              {classObject.display}
+            </Link>
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            {classObject.description[locale]}
+          </p>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-2 text-sm font-medium">{t("prefix")}</p>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-medium">{t("singular")}</TableCell>
+                <TableCell className="font-medium">{t("plural")}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>{classObject.prefix.singular}</TableCell>
+                <TableCell>{classObject.prefix.plural}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>{classObject.singularExample[locale]}</TableCell>
+                <TableCell>{classObject.pluralExample[locale]}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
       </Card>
     </div>
   );

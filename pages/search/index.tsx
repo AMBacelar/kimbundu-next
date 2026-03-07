@@ -2,7 +2,6 @@ import Layout from "../../components/Layout";
 import { SearchBar } from "../../components/searchBar";
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import { useRouter } from "next/router";
-import type { PaginationProps } from "semantic-ui-react";
 import { Pagination } from "../../components/pagination";
 import { searchEntries } from "../../fetch-data/dictionary-server";
 import type { PublicDictionaryEntry } from "../../types/dictionary";
@@ -37,6 +36,7 @@ const SearchResultPage = ({
   const router = useRouter();
   const { locale, query } = router;
   const { targetPage } = query;
+
   const t = (stringPath: string, stringReplace?: string) => {
     let result = i18n[stringPath][locale];
     if (stringReplace) {
@@ -45,21 +45,16 @@ const SearchResultPage = ({
     return result;
   };
 
-  const onPageChange = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    data: PaginationProps
-  ) => {
-    e.preventDefault();
-    const page = Number(data.activePage) || 1;
+  const onPageChange = (page: number) => {
     router.push(`/search?term=${term}&targetPage=${page}`);
   };
 
   return (
     <Layout title={`${term} | ${t("baseTitle")}`}>
-      <h1>{t("searchResult", term)}</h1>
+      <h1 className="mb-4 text-2xl font-bold">{t("searchResult", term)}</h1>
       <SearchBar searchTerm={term} />
       {results.length === 0 ? (
-        <div>{t("noResults")}</div>
+        <div className="mt-4 text-muted-foreground">{t("noResults")}</div>
       ) : (
         results.map((result, i) => (
           <DictionaryEntryComponent key={i} entry={result} />

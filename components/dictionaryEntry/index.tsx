@@ -1,8 +1,7 @@
-import React from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Card, Flag, Message } from "semantic-ui-react";
-import styles from "./styles.module.scss";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ClassBadge } from "../classBadge";
 import type { PublicDictionaryEntry } from "../../types/dictionary";
 
@@ -42,41 +41,40 @@ export const DictionaryEntryComponent = ({ entry }: Props) => {
     entry.class_index != null ? String(entry.class_index) : null;
 
   return (
-    <div className={styles["wrapper"]}>
-      <Card fluid>
+    <div className="my-5 max-w-2xl">
+      <Card>
         {classNumber != null && <ClassBadge classNumber={classNumber} />}
-        <Card.Content>
-          <Card.Header>
-            <Link href={destinationUrl}>
+        <CardHeader>
+          <CardTitle>
+            <Link href={destinationUrl} className="hover:underline">
               {entry.lemma}
               {entry.homonym_index > 1
                 ? `${t("homonym")}${entry.homonym_index})`
                 : ""}
             </Link>
-          </Card.Header>
-          <Card.Meta>
-            {entry.part_of_speech.length > 0 && (
-              <span>
-                {t("partOfSpeech")}
-                {entry.part_of_speech.join(", ")}
-                {entry.subtypes.length > 0 &&
-                  ` (${entry.subtypes.join(", ")})`}
-                {entry.number != null ? ` · ${entry.number}` : ""}
-              </span>
-            )}
-          </Card.Meta>
-          <Card.Description>
-            <Message>
-              <Flag name="pt" />
+          </CardTitle>
+          {entry.part_of_speech.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              {t("partOfSpeech")}
+              {entry.part_of_speech.join(", ")}
+              {entry.subtypes.length > 0 && ` (${entry.subtypes.join(", ")})`}
+              {entry.number != null ? ` · ${entry.number}` : ""}
+            </p>
+          )}
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertDescription>
+              <span className="mr-1">🇵🇹</span>
               <strong>{t("ptDef")}:</strong>
-              <ul style={{ marginTop: "0.5em", marginBottom: 0 }}>
+              <ul className="mt-2 list-disc pl-5">
                 {entry.senses.map((sense, i) => (
                   <li key={i}>{sense.definition_pt}</li>
                 ))}
               </ul>
-            </Message>
-          </Card.Description>
-        </Card.Content>
+            </AlertDescription>
+          </Alert>
+        </CardContent>
       </Card>
     </div>
   );

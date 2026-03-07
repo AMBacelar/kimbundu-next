@@ -1,48 +1,23 @@
-import React from "react";
-import { Card, Placeholder, Message, Flag } from "semantic-ui-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export const EntryPlaceholder = () => {
   return (
-    <div style={{ maxWidth: 500, marginBottom: 20, marginTop: 20 }}>
-      <Card fluid>
-        <Card.Content>
-          <Card.Header>
-            <Placeholder>
-              <Placeholder.Line />
-            </Placeholder>
-          </Card.Header>
-          <Card.Meta>
-            <Placeholder>
-              <Placeholder.Line />
-            </Placeholder>
-          </Card.Meta>
-          <Card.Description>
-            <Message>
-              <Placeholder>
-                <Placeholder.Paragraph>
-                  <Placeholder.Line />
-                  <Placeholder.Line />
-                </Placeholder.Paragraph>
-              </Placeholder>
-            </Message>
-            <Message>
-              <Placeholder>
-                <Placeholder.Paragraph>
-                  <Placeholder.Line />
-                  <Placeholder.Line />
-                </Placeholder.Paragraph>
-              </Placeholder>
-            </Message>
-            <Message>
-              <Placeholder>
-                <Placeholder.Paragraph>
-                  <Placeholder.Line />
-                  <Placeholder.Line />
-                </Placeholder.Paragraph>
-              </Placeholder>
-            </Message>
-          </Card.Description>
-        </Card.Content>
+    <div className="my-5 max-w-2xl animate-pulse">
+      <Card>
+        <CardHeader>
+          <div className="h-5 w-2/3 rounded bg-muted" />
+          <div className="mt-1 h-4 w-1/3 rounded bg-muted" />
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="rounded border border-border p-3">
+            <div className="h-4 w-full rounded bg-muted" />
+            <div className="mt-2 h-4 w-5/6 rounded bg-muted" />
+          </div>
+          <div className="rounded border border-border p-3">
+            <div className="h-4 w-full rounded bg-muted" />
+            <div className="mt-2 h-4 w-4/6 rounded bg-muted" />
+          </div>
+        </CardContent>
       </Card>
     </div>
   );
