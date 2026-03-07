@@ -28,7 +28,7 @@ The dictionary data comes from historical source material and is published with 
 - Noun class browsing:
   - class index page
   - class detail pages with paginated entries
-- About page describing mission and editorial process
+- About page describing mission and editorial process`n- Dedicated Kimbundu introduction page (`/kimbundu`) for language, people, and cultural context
 
 ### Other currently available pages/features
 - Beta translator page (`/translate`) with UI present but service intentionally unavailable in current mode
