@@ -205,3 +205,14 @@ const classList: ClassObject[] = [
 
 export const buildClass = (classNumber: string): ClassObject =>
   classList[Number(classNumber)];
+
+const CLASS_DISPLAY_TO_INDEX: Record<string, number> = Object.fromEntries(
+  classList.map((c, i) => [c.display, i])
+);
+
+/** Map noun_class.dictionary_class (e.g. "IX") to class list index 0–9. */
+export const dictionaryClassToIndex = (dictionaryClass: string | null): number | null => {
+  if (dictionaryClass == null) return null;
+  const i = CLASS_DISPLAY_TO_INDEX[dictionaryClass];
+  return i !== undefined ? i : null;
+};

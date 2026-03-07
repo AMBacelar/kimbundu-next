@@ -1,13 +1,12 @@
-import { GetStaticProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
 
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import Layout from "../../components/Layout";
 import { getEntry } from "../../fetch-data/get-entry";
-import { DictionaryEntry } from "../../interfaces";
+import type { PublicDictionaryEntry } from "../../types/dictionary";
 
 type Props = {
-  results?: DictionaryEntry[];
+  results: PublicDictionaryEntry[];
   term: string;
 };
 
@@ -39,7 +38,7 @@ const KimbunduEntryPage = ({ results, term }: Props) => {
   const { locale } = router;
   const t = (stringPath: string) => i18n[stringPath][locale];
 
-  if (results.length === 0) {
+  if (!results.length) {
     return (
       <Layout title={t("errorTitle")}>
         <p>
@@ -61,18 +60,24 @@ const KimbunduEntryPage = ({ results, term }: Props) => {
 
 export default KimbunduEntryPage;
 
-export async function getServerSideProps({ params, query }) {
+export async function getServerSideProps({
+  params,
+  query,
+}: {
+  params: { kimbunduText: string };
+  query: { targetPage?: string };
+}) {
   const potentialWord = params.kimbunduText;
   const { results, numPages } = await getEntry(
     potentialWord,
-    query.targetPage || 0
+    Number(query.targetPage) || 1
   );
 
   return {
     props: {
       term: params.kimbunduText,
-      results,
+      results: results ?? [],
       numPages,
-    }, // will be passed to the page component as props
+    },
   };
 }

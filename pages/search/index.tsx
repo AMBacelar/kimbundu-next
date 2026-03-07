@@ -1,11 +1,11 @@
 import Layout from "../../components/Layout";
-import { DictionaryEntry } from "../../interfaces";
 import { SearchBar } from "../../components/searchBar";
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import { useRouter } from "next/router";
-import Typesense from "typesense";
-import dot from "dot-object";
+import type { PaginationProps } from "semantic-ui-react";
 import { Pagination } from "../../components/pagination";
+import { searchEntries } from "../../fetch-data/dictionary-server";
+import type { PublicDictionaryEntry } from "../../types/dictionary";
 
 const i18n = {
   baseTitle: {
@@ -30,7 +30,7 @@ const SearchResultPage = ({
   term,
   numPages,
 }: {
-  results?: DictionaryEntry[];
+  results: PublicDictionaryEntry[];
   term: string;
   numPages: number;
 }) => {
@@ -45,9 +45,13 @@ const SearchResultPage = ({
     return result;
   };
 
-  const onPageChange = (e, data) => {
+  const onPageChange = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    data: PaginationProps
+  ) => {
     e.preventDefault();
-    router.push(`/search?term=${term}&targetPage=${data.activePage}`);
+    const page = Number(data.activePage) || 1;
+    router.push(`/search?term=${term}&targetPage=${page}`);
   };
 
   return (
@@ -72,7 +76,13 @@ const SearchResultPage = ({
 
 export default SearchResultPage;
 
-export async function getServerSideProps({ query, res }) {
+export async function getServerSideProps({
+  query,
+  res,
+}: {
+  query: { term?: string; targetPage?: string };
+  res: { setHeader: (name: string, value: string) => void };
+}) {
   res.setHeader("Cache-Control", "public");
   if (!query.term) {
     return {
@@ -83,34 +93,14 @@ export async function getServerSideProps({ query, res }) {
     };
   }
 
-  const client = new Typesense.Client({
-    nodes: [
-      {
-        host: process.env.TYPESENSE_HOST,
-        port: Number(process.env.TYPESENSE_PORT),
-        protocol: process.env.TYPESENSE_PROTOCOL,
-      },
-    ],
-    apiKey: process.env.TYPESENSE_API_KEY,
-  });
-
-  const page = query.targetPage || 1;
-
-  const response = await client.collections("entries").documents().search({
-    query_by:
-      "translations.en,translations.pt,translations.fr,literalTranslations.en,literalTranslations.fr,literalTranslations.pt,kimbunduText",
-    q: query.term,
-    page,
-  });
-
-  const results = response.hits.map((hit) => dot.object(hit.document));
-  const numPages = Math.ceil(response.found / response.request_params.per_page);
+  const page = Math.max(1, parseInt(String(query.targetPage), 10) || 1);
+  const { results, numPages } = searchEntries(query.term, page);
 
   return {
     props: {
-      term: response.request_params.q,
+      term: query.term,
       results,
       numPages,
-    }, // will be passed to the page component as props
+    },
   };
 }

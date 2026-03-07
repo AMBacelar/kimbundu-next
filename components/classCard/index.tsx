@@ -38,10 +38,8 @@ export const ClassCard = ({ classIndex }: Props) => {
     <div className={styles["wrapper"]}>
       <Card fluid>
         <Card.Content>
-          <Link passHref href={desinationUrl}>
-            <Card.Header>
-              <a>{classObject.display}</a>
-            </Card.Header>
+          <Link href={desinationUrl}>
+            <Card.Header>{classObject.display}</Card.Header>
           </Link>
           <Card.Meta>{classObject.description[locale]}</Card.Meta>
           <Card.Description>

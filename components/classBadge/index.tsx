@@ -9,7 +9,7 @@ export const ClassBadge = ({ classNumber }: { classNumber: string }) => {
   const classObject = buildClass(classNumber);
   return (
     <div className={styles["wrapper"]}>
-      <Link passHref href={`/classes/${classNumber}`}>
+      <Link href={`/classes/${classNumber}`}>
         {`${classObject.display} - ${classObject.description[locale]}`}
       </Link>
     </div>

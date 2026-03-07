@@ -1,177 +1,83 @@
-import React, { useEffect, useState } from "react";
-import type { DictionaryEntry } from "../../interfaces";
+import React from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Card, Flag, Message } from "semantic-ui-react";
 import styles from "./styles.module.scss";
 import { ClassBadge } from "../classBadge";
-import { getTagObject } from "../../helpers/tag-parser";
-import { getTag } from "../../fetch-data/get-tag";
+import type { PublicDictionaryEntry } from "../../types/dictionary";
 
 type Props = {
-  entry: DictionaryEntry;
+  entry: PublicDictionaryEntry;
 };
 
 const i18n = {
-  kimText: {
-    en: "Kimbundu Text: ",
-    fr: "Texte de Kimbundu : ",
-    pt: "Texto Kimbundu: ",
+  lemma: {
+    en: "Kimbundu: ",
+    fr: "Kimbundu : ",
+    pt: "Kimbundu: ",
   },
-  diaFree: {
-    en: "Diacritic free: ",
-    fr: "Sans signe diacritique : ",
-    pt: "Sem diacríticos: ",
+  homonym: {
+    en: " (homonym ",
+    fr: " (homonyme ",
+    pt: " (homónimo ",
   },
-  tag: {
-    en: "Tags: ",
-    fr: "Tags: ",
-    pt: "Etiqueta: ",
+  partOfSpeech: {
+    en: "Part of speech: ",
+    fr: "Partie du discours : ",
+    pt: "Classe gramatical: ",
   },
-  otherWordsWithTag: {
-    en: "other words with the tag",
-    fr: "d'autres mots avec le tag",
-    pt: "outras palavras com a etiqueta",
+  ptDef: {
+    en: "Portuguese definition",
+    fr: "Définition portugaise",
+    pt: "Definição em português",
   },
-  ptTrans: {
-    en: "Portuguese Translation: ",
-    fr: "Traduction portugaise : ",
-    pt: "Tradução para o português: ",
-  },
-  ptLitText: {
-    en: "Portuguese Literal Translation: ",
-    fr: "Traduction littérale portugaise : ",
-    pt: "Tradução literal do português: ",
-  },
-  enTrans: {
-    en: "English Translation: ",
-    fr: "Traduction anglaise : ",
-    pt: "Tradução do inglês: ",
-  },
-  enLitText: {
-    en: "English Literal Translation: ",
-    fr: "Traduction littérale en anglais : ",
-    pt: "Tradução literal em inglês: ",
-  },
-  frTrans: {
-    en: "French Translation: ",
-    fr: "Traduction française : ",
-    pt: "Tradução francesa: ",
-  },
-  frLitText: {
-    en: "French Literal Translation: ",
-    fr: "Traduction littérale française : ",
-    pt: "Tradução literal em francês: ",
-  },
-};
-
-const RelatedWords = ({ tag, locale }) => {
-  const [relatedWords, setRelatedWords] = useState([]);
-  useEffect(() => {
-    (async () => {
-      const words = await getTag(tag.index, 1);
-      const relatedWords = words.results.map(
-        ({ kimbunduText, diacriticFree }) => ({ kimbunduText, diacriticFree })
-      );
-      setRelatedWords(relatedWords);
-    })();
-  }, []);
-  const t = (stringPath: string) => i18n[stringPath][locale];
-
-  if (relatedWords.length === 0) return null;
-
-  const renderedWords = relatedWords.map((word, i) => (
-    <Link key={i} passHref href={`/word/${word.diacriticFree}`}>
-      <em>
-        <a>{` ${word.kimbunduText}`}</a>
-        {i !== relatedWords.length - 1 && ","}
-      </em>
-    </Link>
-  ));
-
-  return (
-    <Card fluid key={tag.index}>
-      <Card.Content>
-        <p>
-          {`${t("otherWordsWithTag")}`}{" "}
-          <Link passHref href={`/tags/${tag.index}`}>
-            <a>{tag[locale]}</a>
-          </Link>
-          :
-        </p>
-        <div> {renderedWords}</div>
-      </Card.Content>
-    </Card>
-  );
 };
 
 export const DictionaryEntryComponent = ({ entry }: Props) => {
   const router = useRouter();
   const { locale } = router;
   const t = (stringPath: string) => i18n[stringPath][locale];
-  const desinationUrl = `/word/${entry.diacriticFree}`;
-
-  const tagList = entry.tags.map((tag) => {
-    const tagObject = getTagObject(tag);
-    return (
-      <Link passHref href={`/tags/${tagObject.index}`}>
-        <a>{tagObject[locale]}</a>
-      </Link>
-    );
-  });
-
-  const relatedWords = entry.tags.map((tag) => {
-    const tagObject = getTagObject(tag);
-    return (
-      <RelatedWords key={tagObject.index} tag={tagObject} locale={locale} />
-    );
-  });
+  const destinationUrl = `/word/${entry.lemma_normalized}`;
+  const classNumber =
+    entry.class_index != null ? String(entry.class_index) : null;
 
   return (
     <div className={styles["wrapper"]}>
       <Card fluid>
-        {entry.class && <ClassBadge classNumber={entry.class} />}
+        {classNumber != null && <ClassBadge classNumber={classNumber} />}
         <Card.Content>
           <Card.Header>
-            <Link passHref href={desinationUrl}>
-              <a>{entry.kimbunduText}</a>
+            <Link href={destinationUrl}>
+              {entry.lemma}
+              {entry.homonym_index > 1
+                ? `${t("homonym")}${entry.homonym_index})`
+                : ""}
             </Link>
           </Card.Header>
-          <Card.Meta>{`${t("diaFree")}${entry.diacriticFree}`}</Card.Meta>
-          {entry.tags.length > 0 && (
-            <Card.Meta>
-              {`${t("tag")}`}
-              {tagList}
-            </Card.Meta>
-          )}
+          <Card.Meta>
+            {entry.part_of_speech.length > 0 && (
+              <span>
+                {t("partOfSpeech")}
+                {entry.part_of_speech.join(", ")}
+                {entry.subtypes.length > 0 &&
+                  ` (${entry.subtypes.join(", ")})`}
+                {entry.number != null ? ` · ${entry.number}` : ""}
+              </span>
+            )}
+          </Card.Meta>
           <Card.Description>
             <Message>
               <Flag name="pt" />
-              <span>{`${t("ptTrans")}${entry.translations.pt}`}</span>
-              {entry.literalTranslations.pt && (
-                <p>{`${t("ptLitText")}${entry.literalTranslations.pt}`}</p>
-              )}
-            </Message>
-
-            <Message>
-              <Flag name="uk" />
-              <span>{`${t("enTrans")}${entry.translations.en}`}</span>
-              {entry.literalTranslations.en && (
-                <p>{`${t("enLitText")}${entry.literalTranslations.en}`}</p>
-              )}
-            </Message>
-            <Message>
-              <Flag name="fr" />
-              <span>{`${t("frTrans")}${entry.translations.fr}`}</span>
-              {entry.literalTranslations.en && (
-                <p>{`${t("frLitText")}${entry.literalTranslations.fr}`}</p>
-              )}
+              <strong>{t("ptDef")}:</strong>
+              <ul style={{ marginTop: "0.5em", marginBottom: 0 }}>
+                {entry.senses.map((sense, i) => (
+                  <li key={i}>{sense.definition_pt}</li>
+                ))}
+              </ul>
             </Message>
           </Card.Description>
         </Card.Content>
-        {entry.tags.length > 0 && relatedWords}
       </Card>
-      {/* <p>context:</p>*/}
     </div>
   );
 };

@@ -19,11 +19,11 @@ function MyApp({ Component, pageProps }: AppProps) {
       logEvent(analytics, "page_view", { url });
     };
 
-    const handleRouteChangeStart = (url, { shallow }) => {
+    const handleRouteChangeStart = (url: string, _options?: { shallow?: boolean }) => {
       if (
-        url.includes("/entry/") ||
-        url.includes("/search?") ||
-        url.includes("/class/")
+        url.includes("/word/") ||
+        url.includes("/search") ||
+        url.includes("/classes/")
       ) {
         setLoading(true);
       }

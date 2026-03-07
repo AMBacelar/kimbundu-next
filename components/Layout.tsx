@@ -83,10 +83,10 @@ const Layout = ({
       </Head>
       <header>
         <Menu>
-          <Link passHref href="/">
+          <Link href="/">
             <Menu.Item active={pathname === "/"} name={t("home")} />
           </Link>
-          <Link passHref href="/about">
+          <Link href="/about">
             <Menu.Item active={pathname === "/about"} name={t("about")} />
           </Link>
           {/* <Link passHref href="/translate">

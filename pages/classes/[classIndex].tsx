@@ -1,13 +1,14 @@
 import { useRouter } from "next/router";
 import React from "react";
+import type { PaginationProps } from "semantic-ui-react";
 
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import Layout from "../../components/Layout";
 import { buildClass } from "../../helpers/build-class";
-import { DictionaryEntry } from "../../interfaces";
 import { getClass } from "../../fetch-data/get-class";
 import { Pagination } from "../../components/pagination";
 import { ClassCard } from "../../components/classCard";
+import type { PublicDictionaryEntry } from "../../types/dictionary";
 
 const i18n = {
   errorTitle: {
@@ -27,7 +28,7 @@ const ClassIndexPage = ({
   term,
   numPages,
 }: {
-  results?: DictionaryEntry[];
+  results: PublicDictionaryEntry[];
   term: string;
   numPages: number;
 }) => {
@@ -37,9 +38,13 @@ const ClassIndexPage = ({
   const t = (stringPath: string) => i18n[stringPath][locale];
   const classObject = buildClass(term);
 
-  const onPageChange = (e, data) => {
+  const onPageChange = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    data: PaginationProps
+  ) => {
     e.preventDefault();
-    router.push(`/classes/${term}?targetPage=${data.activePage}`);
+    const page = Number(data.activePage) || 1;
+    router.push(`/classes/${term}?targetPage=${page}`);
   };
 
   return (
@@ -63,19 +68,33 @@ const ClassIndexPage = ({
 
 export default ClassIndexPage;
 
-export async function getServerSideProps({ params, query }) {
+export async function getServerSideProps({
+  params,
+  query,
+}: {
+  params: { classIndex: string };
+  query: { targetPage?: string };
+}) {
   const potentialClass = params.classIndex;
-
   const { results, numPages } = await getClass(
     potentialClass,
-    query.targetPage || 0
+    Number(query.targetPage) || 1
   );
+
+  if (results.length === 0) {
+    return {
+      redirect: {
+        destination: "/classes",
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
       term: params.classIndex,
       results,
       numPages,
-    }, // will be passed to the page component as props
+    },
   };
 }
