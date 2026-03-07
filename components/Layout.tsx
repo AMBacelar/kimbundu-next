@@ -13,9 +13,14 @@ type Props = {
 
 const i18n = {
   about: {
-    en: "About",
-    fr: "A propos",
-    pt: "Sobre",
+    en: "About project",
+    fr: "A propos du projet",
+    pt: "Sobre o projeto",
+  },
+  intro: {
+    en: "About Kimbundu",
+    fr: "A propos du kimbundu",
+    pt: "Sobre o kimbundu",
   },
   home: {
     en: "Dictionary",
@@ -26,11 +31,6 @@ const i18n = {
     en: "Noun classes",
     fr: "Classes nominales",
     pt: "Classes nominais",
-  },
-  translate: {
-    en: "Translator beta",
-    fr: "Traducteur beta",
-    pt: "Tradutor beta",
   },
   language: {
     en: "Language",
@@ -87,9 +87,9 @@ const Layout = ({
 
   const navItems = [
     { href: "/", label: t("home"), active: isDictionaryRoute },
+    { href: "/kimbundu", label: t("intro"), active: pathname === "/kimbundu" },
     { href: "/classes", label: t("classes"), active: pathname.startsWith("/classes") },
     { href: "/about", label: t("about"), active: pathname === "/about" },
-    { href: "/translate", label: t("translate"), active: pathname === "/translate" },
   ];
 
   return (
