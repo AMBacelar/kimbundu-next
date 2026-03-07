@@ -51,7 +51,7 @@ export type DictionaryCanonPayload = {
 };
 
 /**
- * Slim shape sent to the client (no raw IDs, no editorial metadata).
+ * Slim shape sent to the client (no raw IDs, minimal editorial/source metadata).
  */
 export type PublicDictionaryEntry = {
   lemma: string;
@@ -61,6 +61,9 @@ export type PublicDictionaryEntry = {
   part_of_speech: string[];
   subtypes: string[];
   number: string | null;
-  senses: Array<{ definition_pt: string }>;
+  senses: Array<{ definition_pt: string; cross_references: string[] }>;
+  cross_references: string[];
+  needs_review: boolean;
   source_page: number | null;
+  source_column: string | null;
 };

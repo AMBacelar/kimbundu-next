@@ -8,15 +8,20 @@ import { ClassCard } from "../../components/classCard";
 import type { PublicDictionaryEntry } from "../../types/dictionary";
 
 const i18n = {
-  errorTitle: {
-    en: "Error | Online Kimbundu dictionary",
-    fr: "Erreur | Dictionnaire Kimbundu en ligne",
-    pt: "Erro | Dicionário Kimbundu online",
-  },
   baseTitle: {
-    en: "Online Kimbundu dictionary",
-    fr: "Dictionnaire Kimbundu en ligne",
-    pt: "Dicionário Kimbundu online",
+    en: "Kimbundu Dictionary",
+    fr: "Dictionnaire Kimbundu",
+    pt: "Dicionario Kimbundu",
+  },
+  heading: {
+    en: "Class overview",
+    fr: "Vue de la classe",
+    pt: "Visao da classe",
+  },
+  count: {
+    en: "XXXXXX entries in this class",
+    fr: "XXXXXX entrees dans cette classe",
+    pt: "XXXXXX entradas nesta classe",
   },
 };
 
@@ -24,36 +29,59 @@ const ClassIndexPage = ({
   results,
   term,
   numPages,
+  totalMatches,
 }: {
   results: PublicDictionaryEntry[];
   term: string;
   numPages: number;
+  totalMatches: number;
 }) => {
   const router = useRouter();
   const { locale, query } = router;
+  const currentLocale = (locale as "pt" | "fr" | "en") || "en";
   const { targetPage } = query;
-  const t = (stringPath: string) => i18n[stringPath][locale];
+  const t = (stringPath: keyof typeof i18n, replaceValue?: string) => {
+    let result = i18n[stringPath][currentLocale];
+    if (replaceValue) {
+      result = result.replace("XXXXXX", replaceValue);
+    }
+    return result;
+  };
+
   const classObject = buildClass(term);
 
   const onPageChange = (page: number) => {
     router.push(`/classes/${term}?targetPage=${page}`);
   };
 
+  const currentPage = Math.max(1, parseInt(targetPage as string, 10) || 1);
+
   return (
     <Layout
-      title={`${classObject.display} - ${classObject.description[locale]} | ${t(
-        "baseTitle"
-      )}`}
+      title={`${classObject.display} - ${classObject.description[currentLocale]} | ${t("baseTitle")}`}
+      description={classObject.description[currentLocale]}
     >
-      <ClassCard classIndex={term} />
-      {results.map((result, i) => (
-        <DictionaryEntryComponent key={i} entry={result} />
-      ))}
-      <Pagination
-        numPages={numPages}
-        currentPage={targetPage ? parseInt(targetPage as string) : 1}
-        onPageChange={onPageChange}
-      />
+      <div className="space-y-6">
+        <section className="kimbundu-surface space-y-2">
+          <p className="kimbundu-kicker">{t("heading")}</p>
+          <h1 className="kimbundu-section-title">{`Class ${classObject.display}`}</h1>
+          <p className="text-muted-foreground">{t("count", String(totalMatches))}</p>
+        </section>
+
+        <ClassCard classIndex={term} />
+
+        <section>
+          {results.map((result, i) => (
+            <DictionaryEntryComponent key={`${result.lemma_normalized}-${i}`} entry={result} />
+          ))}
+        </section>
+
+        <Pagination
+          numPages={numPages}
+          currentPage={currentPage}
+          onPageChange={onPageChange}
+        />
+      </div>
     </Layout>
   );
 };
@@ -68,7 +96,7 @@ export async function getServerSideProps({
   query: { targetPage?: string };
 }) {
   const potentialClass = params.classIndex;
-  const { results, numPages } = await getClass(
+  const { results, numPages, totalMatches } = await getClass(
     potentialClass,
     Number(query.targetPage) || 1
   );
@@ -87,6 +115,7 @@ export async function getServerSideProps({
       term: params.classIndex,
       results,
       numPages,
+      totalMatches,
     },
   };
 }

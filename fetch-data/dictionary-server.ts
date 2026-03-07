@@ -14,6 +14,15 @@ const loadEntries = (): DictionaryEntryCanon[] => {
   return cachedEntries;
 };
 
+const normalizeReferences = (references: string[] = []): string[] => {
+  const parsed = references
+    .flatMap((reference) => reference.split(/[;,]/))
+    .map((reference) => reference.trim())
+    .filter(Boolean);
+
+  return Array.from(new Set(parsed));
+};
+
 const toPublicEntry = (e: DictionaryEntryCanon): PublicDictionaryEntry => ({
   lemma: e.lemma,
   lemma_normalized: e.lemma_normalized,
@@ -22,10 +31,14 @@ const toPublicEntry = (e: DictionaryEntryCanon): PublicDictionaryEntry => ({
   part_of_speech: e.clean.grammar.part_of_speech ?? [],
   subtypes: e.clean.grammar.subtypes ?? [],
   number: e.clean.grammar.number ?? null,
-  senses: (e.clean.senses ?? []).map((s) => ({
-    definition_pt: s.definition_pt_source,
+  senses: (e.clean.senses ?? []).map((sense) => ({
+    definition_pt: sense.definition_pt_source,
+    cross_references: normalizeReferences(sense.cross_references),
   })),
+  cross_references: normalizeReferences(e.clean.cross_references),
+  needs_review: Boolean(e.editorial?.needs_review),
   source_page: e.source?.page ?? null,
+  source_column: e.source?.column ?? null,
 });
 
 const normalizeForMatch = (s: string): string =>
@@ -35,42 +48,51 @@ const normalizeForMatch = (s: string): string =>
     .replace(/\p{Diacritic}/gu, "");
 
 const entryMatchesSearch = (e: DictionaryEntryCanon, qNorm: string): boolean => {
-  if (e.lemma_normalized && normalizeForMatch(e.lemma_normalized).includes(qNorm))
+  if (e.lemma_normalized && normalizeForMatch(e.lemma_normalized).includes(qNorm)) {
     return true;
+  }
+
   for (const sense of e.clean.senses ?? []) {
     if (
       sense.definition_pt_normalized &&
       normalizeForMatch(sense.definition_pt_normalized).includes(qNorm)
-    )
+    ) {
       return true;
+    }
+
     if (
       sense.definition_pt_source &&
       normalizeForMatch(sense.definition_pt_source).includes(qNorm)
-    )
+    ) {
       return true;
+    }
   }
+
   return false;
 };
 
 export const searchEntries = (
   q: string,
   page: number
-): { results: PublicDictionaryEntry[]; numPages: number } => {
+): { results: PublicDictionaryEntry[]; numPages: number; totalMatches: number } => {
   const entries = loadEntries();
   const qNorm = normalizeForMatch(q).trim();
   const filtered = qNorm
     ? entries.filter(
-        (e) =>
-          e.publishable_with_review !== false && entryMatchesSearch(e, qNorm)
+        (e) => e.publishable_with_review !== false && entryMatchesSearch(e, qNorm)
       )
     : [];
-  const numPages = Math.max(1, Math.ceil(filtered.length / ENTRIES_PER_PAGE));
+
+  const totalMatches = filtered.length;
+  const numPages = Math.max(1, Math.ceil(totalMatches / ENTRIES_PER_PAGE));
   const p = Math.max(1, Math.min(page, numPages));
   const start = (p - 1) * ENTRIES_PER_PAGE;
-  const results = filtered
-    .slice(start, start + ENTRIES_PER_PAGE)
-    .map(toPublicEntry);
-  return { results, numPages };
+
+  return {
+    results: filtered.slice(start, start + ENTRIES_PER_PAGE).map(toPublicEntry),
+    numPages,
+    totalMatches,
+  };
 };
 
 export const getEntriesByLemma = (
@@ -81,6 +103,7 @@ export const getEntriesByLemma = (
   numPages: number;
   showNext: boolean;
   showPrevious: boolean;
+  totalMatches: number;
 } => {
   const entries = loadEntries();
   const norm = normalizeForMatch(lemmaNormalized).trim();
@@ -89,17 +112,18 @@ export const getEntriesByLemma = (
       e.publishable_with_review !== false &&
       normalizeForMatch(e.lemma_normalized) === norm
   );
-  const numPages = Math.max(1, Math.ceil(matching.length / ENTRIES_PER_PAGE));
+
+  const totalMatches = matching.length;
+  const numPages = Math.max(1, Math.ceil(totalMatches / ENTRIES_PER_PAGE));
   const p = Math.max(1, Math.min(page, numPages));
   const start = (p - 1) * ENTRIES_PER_PAGE;
-  const results = matching
-    .slice(start, start + ENTRIES_PER_PAGE)
-    .map(toPublicEntry);
+
   return {
-    results,
+    results: matching.slice(start, start + ENTRIES_PER_PAGE).map(toPublicEntry),
     numPages,
     showNext: p < numPages,
     showPrevious: p > 1,
+    totalMatches,
   };
 };
 
@@ -111,24 +135,29 @@ export const getEntriesByClass = (
   numPages: number;
   showNext: boolean;
   showPrevious: boolean;
+  totalMatches: number;
 } => {
   const entries = loadEntries();
-  const classDisplay = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][classIndex];
+  const classDisplay = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][
+    classIndex
+  ];
+
   const matching = entries.filter(
     (e) =>
       e.publishable_with_review !== false &&
       e.clean.noun_class.dictionary_class === classDisplay
   );
-  const numPages = Math.max(1, Math.ceil(matching.length / ENTRIES_PER_PAGE));
+
+  const totalMatches = matching.length;
+  const numPages = Math.max(1, Math.ceil(totalMatches / ENTRIES_PER_PAGE));
   const p = Math.max(1, Math.min(page, numPages));
   const start = (p - 1) * ENTRIES_PER_PAGE;
-  const results = matching
-    .slice(start, start + ENTRIES_PER_PAGE)
-    .map(toPublicEntry);
+
   return {
-    results,
+    results: matching.slice(start, start + ENTRIES_PER_PAGE).map(toPublicEntry),
     numPages,
     showNext: p < numPages,
     showPrevious: p > 1,
+    totalMatches,
   };
 };

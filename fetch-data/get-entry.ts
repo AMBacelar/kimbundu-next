@@ -9,6 +9,7 @@ export const getEntry = async (
   showNext: boolean;
   showPrevious: boolean;
   numPages: number;
+  totalMatches: number;
 }> => {
   const page = Math.max(1, Number(targetPage) || 1);
   return getEntriesByLemma(lemmaNormalized, page);
