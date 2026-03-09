@@ -1,8 +1,13 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 
-const firebaseConfig = JSON.parse(process.env.NEXT_PUBLIC_FIREBASE_CONFIG);
+const raw = process.env.NEXT_PUBLIC_FIREBASE_CONFIG;
 
-const firebase =
-  getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+let firebase: FirebaseApp | null = null;
 
-export default firebase;
+if (raw) {
+  const firebaseConfig = JSON.parse(raw);
+  firebase =
+    getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+}
+
+export default firebase as FirebaseApp;

@@ -4,51 +4,50 @@ import { useRouter } from "next/router";
 import "../styles/globals.css";
 import firebase from "../utils/firebase";
 import { getAnalytics, logEvent } from "firebase/analytics";
-
 import { Analytics } from "@vercel/analytics/react";
-import LoadingEntries from "./loadingEntries";
+
+const RouteProgress = () => {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const start = () => setLoading(true);
+    const end = () => setLoading(false);
+    router.events.on("routeChangeStart", start);
+    router.events.on("routeChangeComplete", end);
+    router.events.on("routeChangeError", end);
+    return () => {
+      router.events.off("routeChangeStart", start);
+      router.events.off("routeChangeComplete", end);
+      router.events.off("routeChangeError", end);
+    };
+  }, [router]);
+
+  if (!loading) return null;
+  return <div className="route-progress" aria-hidden="true" />;
+};
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (!firebase) return;
     const analytics = getAnalytics(firebase);
-
-    const doLogEvent = (url: string) => {
+    const logPageView = (url: string) =>
       logEvent(analytics, "page_view", { url });
-    };
 
-    const handleRouteChangeStart = (url: string, _options?: { shallow?: boolean }) => {
-      if (
-        url.includes("/word/") ||
-        url.includes("/search") ||
-        url.includes("/classes/")
-      ) {
-        setLoading(true);
-      }
-    };
-
-    const handleRouteChangeComplete = (url: string) => {
-      doLogEvent(url);
-      setLoading(false);
-    };
-
-    router.events.on("routeChangeStart", handleRouteChangeStart);
-    router.events.on("routeChangeComplete", handleRouteChangeComplete);
-    doLogEvent(window.location.pathname);
+    router.events.on("routeChangeComplete", logPageView);
+    logPageView(window.location.pathname);
 
     return () => {
-      router.events.off("routeChangeStart", handleRouteChangeStart);
-      router.events.off("routeChangeComplete", handleRouteChangeComplete);
+      router.events.off("routeChangeComplete", logPageView);
     };
   }, []);
 
-  if (loading) return <LoadingEntries />;
-
   return (
     <>
-      <Component {...pageProps} loading={loading} />
+      <RouteProgress />
+      <Component {...pageProps} />
       <Analytics />
     </>
   );

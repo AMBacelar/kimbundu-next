@@ -3,6 +3,7 @@ import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { cn } from "@/lib/utils";
+import { Menu, X } from "lucide-react";
 
 type Props = {
   children?: ReactNode;
@@ -12,25 +13,25 @@ type Props = {
 };
 
 const i18n = {
-  about: {
-    en: "About project",
-    fr: "A propos du projet",
-    pt: "Sobre o projeto",
-  },
-  intro: {
-    en: "About Kimbundu",
-    fr: "A propos du kimbundu",
-    pt: "Sobre o kimbundu",
-  },
   home: {
     en: "Dictionary",
     fr: "Dictionnaire",
-    pt: "Dicionario",
+    pt: "Dicionário",
+  },
+  browse: {
+    en: "Browse",
+    fr: "Explorer",
+    pt: "Explorar",
   },
   classes: {
-    en: "Noun classes",
+    en: "Noun Classes",
     fr: "Classes nominales",
     pt: "Classes nominais",
+  },
+  about: {
+    en: "About",
+    fr: "À propos",
+    pt: "Sobre",
   },
   language: {
     en: "Language",
@@ -42,30 +43,15 @@ const i18n = {
     fr: "Menu",
     pt: "Menu",
   },
-  projectTitle: {
-    en: "Kimbundu Language Archive",
-    fr: "Archive de la langue Kimbundu",
-    pt: "Arquivo da lingua Kimbundu",
-  },
-  projectTagline: {
-    en: "Digital preservation, dictionary access, and long-term language stewardship.",
-    fr: "Preservation numerique, dictionnaire public, et transmission linguistique.",
-    pt: "Preservacao digital, dicionario publico e transmissao linguistica.",
-  },
-  editorialNotice: {
-    en: "Historical dictionary entries are published now and refined continuously through editorial review.",
-    fr: "Les entrees historiques sont publiees et ameliorees progressivement par revision editoriale.",
-    pt: "As entradas historicas ja estao publicas e continuam em revisao editorial progressiva.",
+  footerMission: {
+    en: "Built for long-term Kimbundu language preservation and open-access learning.",
+    fr: "Conçu pour la préservation du kimbundu et un accès public à l'apprentissage.",
+    pt: "Construído para preservação da língua kimbundu e aprendizagem de acesso público.",
   },
   defaultDescription: {
     en: "A public Kimbundu language preservation project with searchable historical dictionary data.",
-    fr: "Projet public de preservation du kimbundu avec un dictionnaire historique consultable.",
-    pt: "Projeto publico de preservacao do kimbundu com dicionario historico pesquisavel.",
-  },
-  footerContext: {
-    en: "Built for long-term Kimbundu language preservation and open access learning.",
-    fr: "Concu pour la preservation du kimbundu et un acces public a l'apprentissage.",
-    pt: "Construido para preservacao da lingua kimbundu e aprendizagem de acesso publico.",
+    fr: "Projet public de préservation du kimbundu avec un dictionnaire historique consultable.",
+    pt: "Projeto público de preservação do kimbundu com dicionário histórico pesquisável.",
   },
 };
 
@@ -84,7 +70,6 @@ const Layout = ({
   const t = (path: keyof typeof i18n) => i18n[path][currentLocale];
   const trueDescription = description || t("defaultDescription");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCompactMobileHeader, setIsCompactMobileHeader] = useState(false);
 
   const changeLocale = (lang: string) =>
     router.push({ pathname, query }, asPath, { locale: lang });
@@ -94,27 +79,28 @@ const Layout = ({
 
   const navItems = [
     { href: "/", label: t("home"), active: isDictionaryRoute },
-    { href: "/kimbundu", label: t("intro"), active: pathname === "/kimbundu" },
+    { href: "/browse", label: t("browse"), active: pathname === "/browse" },
     { href: "/classes", label: t("classes"), active: pathname.startsWith("/classes") },
-    { href: "/about", label: t("about"), active: pathname === "/about" },
+    { href: "/about", label: t("about"), active: pathname === "/about" || pathname === "/kimbundu" },
   ];
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsCompactMobileHeader(window.scrollY > 24);
-    };
-
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [asPath, currentLocale]);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8" />
@@ -139,110 +125,26 @@ const Layout = ({
         <link rel="alternate" hrefLang="pt" href={`${hostname}pt${asPath}`} />
       </Head>
 
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur-md">
-        <div
-          className={cn(
-            "mx-auto flex w-full max-w-6xl flex-col px-4 transition-[padding,gap] duration-200 md:gap-4 md:px-6 md:py-4",
-            isCompactMobileHeader ? "gap-2 py-2" : "gap-4 py-4"
-          )}
-        >
-          <div className="flex items-start justify-between gap-3 md:items-center">
-            <Link href="/" className="group space-y-1">
-              <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-                kimbundu.org
-              </p>
-              <p
-                className={cn(
-                  "font-semibold text-foreground transition-colors group-hover:text-primary",
-                  isCompactMobileHeader ? "text-base md:text-lg" : "text-lg"
-                )}
-              >
-                {t("projectTitle")}
-              </p>
-              <p
-                className={cn(
-                  "max-w-xl overflow-hidden text-sm text-muted-foreground transition-[max-height,opacity] duration-200 md:max-h-20 md:opacity-100",
-                  isCompactMobileHeader ? "max-h-0 opacity-0" : "max-h-20 opacity-100"
-                )}
-              >
-                {t("projectTagline")}
-              </p>
-            </Link>
+      <header className="sticky top-0 z-40 border-b border-border/40 bg-background/80 backdrop-blur-lg">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-6 md:py-4">
+          <Link href="/" className="group flex items-baseline gap-2">
+            <span className="text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary md:text-xl">
+              kimbundu
+            </span>
+            <span className="text-xs font-medium tracking-wide text-muted-foreground">.org</span>
+          </Link>
 
-            <button
-              type="button"
-              className={cn(
-                "flex items-center gap-2 rounded-md border border-border/70 bg-card/80 px-3 py-2 text-xs font-semibold tracking-wide text-foreground uppercase md:hidden",
-                isMobileMenuOpen && "border-primary/40 bg-primary/10"
-              )}
-              onClick={() => setIsMobileMenuOpen((open) => !open)}
-              aria-expanded={isMobileMenuOpen}
-              aria-label={t("menu")}
-            >
-              <span>{t("menu")}</span>
-              <span className="flex w-4 flex-col gap-1">
-                <span className="h-0.5 w-full rounded bg-current" />
-                <span className="h-0.5 w-full rounded bg-current" />
-                <span className="h-0.5 w-full rounded bg-current" />
-              </span>
-            </button>
-
-            <div className="hidden flex-col gap-3 md:ml-auto md:flex md:items-end">
-              <nav className="flex flex-wrap gap-1.5" aria-label="Global">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
-                      item.active
-                        ? "border-primary/40 bg-primary/10 text-foreground"
-                        : "border-transparent bg-muted/70 text-muted-foreground hover:border-border hover:bg-card hover:text-foreground"
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="flex items-center gap-1.5">
-                <span className="mr-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                  {t("language")}
-                </span>
-                {LOCALES.map((lang) => (
-                  <button
-                    key={lang}
-                    onClick={() => changeLocale(lang)}
-                    className={cn(
-                      "rounded-md border px-2 py-1 text-xs font-semibold uppercase transition-colors",
-                      currentLocale === lang
-                        ? "border-primary/40 bg-primary/10 text-foreground"
-                        : "border-transparent text-muted-foreground hover:border-border hover:bg-muted"
-                    )}
-                  >
-                    {lang}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={cn(
-              "overflow-hidden rounded-xl border border-border/70 bg-card/95 transition-[max-height,opacity,padding] duration-200 md:hidden",
-              isMobileMenuOpen ? "max-h-[30rem] px-3 py-3 opacity-100" : "max-h-0 px-3 py-0 opacity-0"
-            )}
-          >
-            <nav className="grid gap-1.5" aria-label="Mobile">
+          <div className="hidden items-center gap-1 md:flex">
+            <nav className="flex items-center gap-0.5" aria-label="Global">
               {navItems.map((item) => (
                 <Link
-                  key={`mobile-${item.href}`}
+                  key={item.href}
                   href={item.href}
                   className={cn(
-                    "rounded-md border px-3 py-2 text-sm font-medium transition-colors",
+                    "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     item.active
-                      ? "border-primary/40 bg-primary/10 text-foreground"
-                      : "border-transparent bg-muted/70 text-muted-foreground hover:border-border hover:bg-card hover:text-foreground"
+                      ? "bg-primary/8 text-foreground"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                   )}
                 >
                   {item.label}
@@ -250,20 +152,67 @@ const Layout = ({
               ))}
             </nav>
 
-            <div className="mt-3 border-t border-border/70 pt-3">
-              <div className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <div className="ml-3 flex items-center gap-0.5 border-l border-border/40 pl-3">
+              {LOCALES.map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => changeLocale(lang)}
+                  className={cn(
+                    "rounded-md px-2 py-1.5 text-xs font-semibold uppercase transition-colors",
+                    currentLocale === lang
+                      ? "bg-primary/10 text-foreground"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  )}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="flex items-center justify-center rounded-lg p-2 text-foreground transition-colors hover:bg-muted/60 md:hidden"
+            onClick={() => setIsMobileMenuOpen((open) => !open)}
+            aria-expanded={isMobileMenuOpen}
+            aria-label={t("menu")}
+          >
+            {isMobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
+
+        {isMobileMenuOpen && (
+          <div className="border-t border-border/40 bg-background/95 backdrop-blur-lg md:hidden">
+            <nav className="mx-auto max-w-6xl space-y-1 px-4 py-3" aria-label="Mobile">
+              {navItems.map((item) => (
+                <Link
+                  key={`mobile-${item.href}`}
+                  href={item.href}
+                  className={cn(
+                    "block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                    item.active
+                      ? "bg-primary/8 text-foreground"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="border-t border-border/40 px-4 py-3">
+              <p className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                 {t("language")}
-              </div>
-              <div className="flex items-center gap-1.5">
+              </p>
+              <div className="flex items-center gap-1">
                 {LOCALES.map((lang) => (
                   <button
                     key={`mobile-locale-${lang}`}
                     onClick={() => changeLocale(lang)}
                     className={cn(
-                      "rounded-md border px-2 py-1 text-xs font-semibold uppercase transition-colors",
+                      "rounded-md px-3 py-1.5 text-xs font-semibold uppercase transition-colors",
                       currentLocale === lang
-                        ? "border-primary/40 bg-primary/10 text-foreground"
-                        : "border-transparent text-muted-foreground hover:border-border hover:bg-muted"
+                        ? "bg-primary/10 text-foreground"
+                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                     )}
                   >
                     {lang}
@@ -272,25 +221,72 @@ const Layout = ({
               </div>
             </div>
           </div>
-
-          <div className="hidden rounded-xl border border-border/70 bg-accent/45 px-3 py-2 text-xs text-muted-foreground md:block md:text-sm">
-            {t("editorialNotice")}
-          </div>
-        </div>
+        )}
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 md:px-6 md:py-10">{children}</main>
+      <main className="flex-1">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 md:px-6 md:py-12">
+          {children}
+        </div>
+      </main>
 
-      <footer className="mt-12 border-t border-border/70 bg-card/50">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-6 md:flex-row md:items-end md:justify-between md:px-6">
-          <div className="rounded-xl border border-border/70 bg-accent/45 px-3 py-2 text-xs text-muted-foreground md:hidden">
-            {t("editorialNotice")}
+      <footer className="mt-auto border-t border-border/40 bg-card/40">
+        <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
+          <div className="grid gap-8 md:grid-cols-[2fr_1fr_1fr]">
+            <div>
+              <p className="mb-1 text-base font-bold tracking-tight text-foreground">
+                kimbundu<span className="font-normal text-muted-foreground">.org</span>
+              </p>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                {t("footerMission")}
+              </p>
+            </div>
+
+            <div>
+              <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-muted-foreground uppercase">
+                Navigate
+              </p>
+              <nav className="flex flex-col gap-2" aria-label="Footer">
+                {navItems.map((item) => (
+                  <Link
+                    key={`footer-${item.href}`}
+                    href={item.href}
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            <div>
+              <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-muted-foreground uppercase">
+                {t("language")}
+              </p>
+              <div className="flex flex-col gap-2">
+                {LOCALES.map((lang) => (
+                  <button
+                    key={`footer-locale-${lang}`}
+                    onClick={() => changeLocale(lang)}
+                    className={cn(
+                      "w-fit text-sm transition-colors",
+                      currentLocale === lang
+                        ? "font-medium text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {lang === "en" ? "English" : lang === "fr" ? "Français" : "Português"}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold text-foreground">Kimbundu Language Archive</p>
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t("footerContext")}</p>
+
+          <div className="mt-8 border-t border-border/40 pt-6">
+            <p className="text-xs text-muted-foreground">
+              &copy; Adilson Bacelar {new Date().getFullYear()}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">Copyright Adilson Bacelar {new Date().getFullYear()}</p>
         </div>
       </footer>
     </div>

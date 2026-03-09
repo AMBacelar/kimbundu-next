@@ -4,7 +4,9 @@ import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
 import Layout from "../../components/Layout";
 import { Pagination } from "../../components/pagination";
 import { getEntry } from "../../fetch-data/get-entry";
+import { EmptyState } from "../../components/shared/EmptyState";
 import type { PublicDictionaryEntry } from "../../types/dictionary";
+import { ArrowLeft, BookOpen } from "lucide-react";
 
 type Props = {
   results: PublicDictionaryEntry[];
@@ -16,38 +18,48 @@ type Props = {
 const i18n = {
   errorTitle: {
     en: "Entry not found | Kimbundu Dictionary",
-    fr: "Entree introuvable | Dictionnaire Kimbundu",
-    pt: "Entrada nao encontrada | Dicionario Kimbundu",
+    fr: "Entrée introuvable | Dictionnaire Kimbundu",
+    pt: "Entrada não encontrada | Dicionário Kimbundu",
   },
   baseTitle: {
     en: "Kimbundu Dictionary",
     fr: "Dictionnaire Kimbundu",
-    pt: "Dicionario Kimbundu",
+    pt: "Dicionário Kimbundu",
   },
   errorText: {
-    en: "This word was not found in the current public dictionary data.",
-    fr: "Ce mot n'a pas ete trouve dans les donnees publiques du dictionnaire.",
-    pt: "Esta palavra nao foi encontrada nos dados publicos atuais do dicionario.",
+    en: "This word was not found in the current dictionary.",
+    fr: "Ce mot n'a pas été trouvé dans le dictionnaire actuel.",
+    pt: "Esta palavra não foi encontrada no dicionário atual.",
+  },
+  errorHelp: {
+    en: "It may not yet be published, or try searching with a different spelling.",
+    fr: "Il n'est peut-être pas encore publié, ou essayez une orthographe différente.",
+    pt: "Pode ainda não estar publicada, ou tente com uma ortografia diferente.",
   },
   count: {
-    en: "XXXXXX entry variants",
-    fr: "XXXXXX variantes d'entree",
-    pt: "XXXXXX variantes de entrada",
+    en: "entry variants",
+    fr: "variantes d'entrée",
+    pt: "variantes de entrada",
   },
   heading: {
     en: "Dictionary entry",
-    fr: "Entree du dictionnaire",
-    pt: "Entrada do dicionario",
-  },
-  reviewNote: {
-    en: "Variant forms and homonyms are grouped below when available.",
-    fr: "Les variantes et homonymes sont groupes ci-dessous lorsqu'ils existent.",
-    pt: "Formas variantes e homonimos sao agrupados abaixo quando disponiveis.",
+    fr: "Entrée du dictionnaire",
+    pt: "Entrada do dicionário",
   },
   searchLink: {
-    en: "Open search",
-    fr: "Ouvrir la recherche",
-    pt: "Abrir pesquisa",
+    en: "Search for this word",
+    fr: "Rechercher ce mot",
+    pt: "Pesquisar esta palavra",
+  },
+  backToSearch: {
+    en: "Back to search",
+    fr: "Retour à la recherche",
+    pt: "Voltar à pesquisa",
+  },
+  backToDictionary: {
+    en: "Back to dictionary",
+    fr: "Retour au dictionnaire",
+    pt: "Voltar ao dicionário",
   },
 };
 
@@ -57,13 +69,7 @@ const KimbunduEntryPage = ({ results, term, numPages, totalMatches }: Props) => 
   const currentLocale = (locale as "pt" | "fr" | "en") || "en";
   const { targetPage } = query;
 
-  const t = (stringPath: keyof typeof i18n, replaceValue?: string) => {
-    let result = i18n[stringPath][currentLocale];
-    if (replaceValue) {
-      result = result.replace("XXXXXX", replaceValue);
-    }
-    return result;
-  };
+  const t = (stringPath: keyof typeof i18n) => i18n[stringPath][currentLocale];
 
   const onPageChange = (page: number) => {
     router.push(`/word/${encodeURIComponent(term)}?targetPage=${page}`);
@@ -74,32 +80,63 @@ const KimbunduEntryPage = ({ results, term, numPages, totalMatches }: Props) => 
   if (!results.length) {
     return (
       <Layout title={t("errorTitle")} description={t("errorText")}>
-        <section className="kimbundu-surface space-y-4">
-          <h1 className="kimbundu-section-title">{t("errorText")}</h1>
+        <div className="space-y-6">
           <Link
-            href={`/search?term=${encodeURIComponent(term)}`}
-            className="inline-flex items-center rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            {t("searchLink")}
+            <ArrowLeft className="size-3.5" />
+            {t("backToDictionary")}
           </Link>
-        </section>
+
+          <EmptyState
+            title={t("errorText")}
+            description={t("errorHelp")}
+            icon={<BookOpen className="size-5" />}
+          >
+            <Link
+              href={`/search?term=${encodeURIComponent(term)}`}
+              className="inline-flex items-center rounded-lg border border-border/60 bg-background/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:bg-primary/8"
+            >
+              {t("searchLink")}
+            </Link>
+          </EmptyState>
+        </div>
       </Layout>
     );
   }
 
   return (
-    <Layout title={`${term} | ${t("baseTitle")}`} description={`Dictionary entry for ${term}`}>
-      <div className="space-y-6">
-        <section className="kimbundu-surface space-y-3">
-          <p className="kimbundu-kicker">{t("heading")}</p>
-          <h1 className="kimbundu-section-title">{term}</h1>
-          <p className="text-sm text-muted-foreground">{t("count", String(totalMatches))}</p>
-          <p className="text-sm text-muted-foreground">{t("reviewNote")}</p>
-        </section>
+    <Layout
+      title={`${term} | ${t("baseTitle")}`}
+      description={`Dictionary entry for ${term}`}
+    >
+      <div className="space-y-8">
+        <div className="space-y-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" />
+            {t("backToDictionary")}
+          </Link>
 
-        <section>
+          <div>
+            <p className="kimbundu-kicker mb-2">{t("heading")}</p>
+            <h1>{term}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {totalMatches} {t("count")}
+            </p>
+          </div>
+        </div>
+
+        <section className="space-y-5">
           {results.map((result, i) => (
-            <DictionaryEntryComponent key={`${result.lemma_normalized}-${i}`} entry={result} />
+            <DictionaryEntryComponent
+              key={`${result.lemma_normalized}-${i}`}
+              entry={result}
+              variant="full"
+            />
           ))}
         </section>
 
@@ -115,13 +152,13 @@ const KimbunduEntryPage = ({ results, term, numPages, totalMatches }: Props) => 
 
 export default KimbunduEntryPage;
 
-export async function getServerSideProps({
+export const getServerSideProps = async ({
   params,
   query,
 }: {
   params: { kimbunduText: string };
   query: { targetPage?: string };
-}) {
+}) => {
   const potentialWord = params.kimbunduText;
   const { results, numPages, totalMatches } = await getEntry(
     potentialWord,
@@ -136,4 +173,4 @@ export async function getServerSideProps({
       totalMatches,
     },
   };
-}
+};

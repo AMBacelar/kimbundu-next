@@ -2,72 +2,65 @@ import Link from "next/link";
 import Layout from "../../components/Layout";
 import { SearchBar } from "../../components/searchBar";
 import { DictionaryEntryComponent } from "../../components/dictionaryEntry";
+import { EmptyState } from "../../components/shared/EmptyState";
 import { useRouter } from "next/router";
 import { Pagination } from "../../components/pagination";
 import { searchEntries } from "../../fetch-data/dictionary-server";
 import type { PublicDictionaryEntry } from "../../types/dictionary";
+import { ArrowLeft } from "lucide-react";
 
 const i18n = {
   baseTitle: {
     en: "Kimbundu Dictionary",
     fr: "Dictionnaire Kimbundu",
-    pt: "Dicionario Kimbundu",
+    pt: "Dicionário Kimbundu",
   },
   searchResult: {
-    en: 'Results for "XXXXXX"',
-    fr: 'Resultats pour "XXXXXX"',
-    pt: 'Resultados para "XXXXXX"',
+    en: "Results for",
+    fr: "Résultats pour",
+    pt: "Resultados para",
   },
   count: {
-    en: "XXXXXX entries found",
-    fr: "XXXXXX entrees trouvees",
-    pt: "XXXXXX entradas encontradas",
+    en: "entries found",
+    fr: "entrées trouvées",
+    pt: "entradas encontradas",
   },
   noResultsTitle: {
-    en: "No dictionary entries matched this search",
-    fr: "Aucune entree ne correspond a cette recherche",
+    en: "No entries matched your search",
+    fr: "Aucune entrée ne correspond à cette recherche",
     pt: "Nenhuma entrada corresponde a esta pesquisa",
   },
   noResultsBody: {
-    en: "Try a shorter term, remove diacritics, or switch query language (Kimbundu / Portuguese).",
-    fr: "Essayez un terme plus court, sans diacritiques, ou changez de langue de recherche (kimbundu / portugais).",
-    pt: "Tente um termo mais curto, sem diacriticos, ou altere o idioma da pesquisa (kimbundu / portugues).",
-  },
-  reviewNote: {
-    en: "Entries are live while refinement continues through editorial review.",
-    fr: "Les entrees sont deja en ligne pendant la revision editoriale continue.",
-    pt: "As entradas ja estao publicas enquanto a revisao editorial continua.",
+    en: "Try a shorter term, remove diacritics, or search in a different language (Kimbundu or Portuguese).",
+    fr: "Essayez un terme plus court, sans diacritiques, ou recherchez dans une autre langue.",
+    pt: "Tente um termo mais curto, sem diacríticos, ou pesquise em outro idioma.",
   },
   goHome: {
-    en: "Back to dictionary home",
-    fr: "Retour a l'accueil du dictionnaire",
-    pt: "Voltar para a pagina inicial do dicionario",
+    en: "Back to dictionary",
+    fr: "Retour au dictionnaire",
+    pt: "Voltar ao dicionário",
+  },
+  browseSuggestion: {
+    en: "Or try browsing by letter",
+    fr: "Ou essayez de parcourir par lettre",
+    pt: "Ou tente explorar por letra",
   },
 };
 
-const SearchResultPage = ({
-  results,
-  term,
-  numPages,
-  totalMatches,
-}: {
+type PageProps = {
   results: PublicDictionaryEntry[];
   term: string;
   numPages: number;
   totalMatches: number;
-}) => {
+};
+
+const SearchResultPage = ({ results, term, numPages, totalMatches }: PageProps) => {
   const router = useRouter();
   const { locale, query } = router;
   const currentLocale = (locale as "pt" | "fr" | "en") || "en";
   const { targetPage } = query;
 
-  const t = (stringPath: keyof typeof i18n, stringReplace?: string) => {
-    let result = i18n[stringPath][currentLocale];
-    if (stringReplace) {
-      result = result.replace("XXXXXX", stringReplace);
-    }
-    return result;
-  };
+  const t = (stringPath: keyof typeof i18n) => i18n[stringPath][currentLocale];
 
   const onPageChange = (page: number) => {
     router.push(`/search?term=${encodeURIComponent(term)}&targetPage=${page}`);
@@ -80,32 +73,61 @@ const SearchResultPage = ({
       title={`${term} | ${t("baseTitle")}`}
       description={`Dictionary results for ${term}`}
     >
-      <div className="space-y-6">
-        <section className="kimbundu-surface space-y-4">
-          <p className="kimbundu-kicker">{t("baseTitle")}</p>
-          <h1 className="kimbundu-section-title">{t("searchResult", term)}</h1>
-          <p className="text-sm text-muted-foreground">{t("count", String(totalMatches))}</p>
-          <div className="rounded-2xl border border-border/70 bg-background/70 p-4">
-            <SearchBar searchTerm={term} />
+      <div className="space-y-8">
+        <div className="space-y-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="size-3.5" />
+            {t("goHome")}
+          </Link>
+
+          <div className="max-w-2xl">
+            <SearchBar searchTerm={term} autoFocus />
           </div>
-          <p className="text-sm text-muted-foreground">{t("reviewNote")}</p>
-        </section>
+
+          {results.length > 0 && (
+            <div>
+              <h1 className="text-2xl md:text-3xl">
+                {t("searchResult")}{" "}
+                <span className="text-primary">&ldquo;{term}&rdquo;</span>
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {totalMatches.toLocaleString()} {t("count")}
+              </p>
+            </div>
+          )}
+        </div>
 
         {results.length === 0 ? (
-          <section className="kimbundu-surface space-y-3">
-            <h2 className="text-2xl">{t("noResultsTitle")}</h2>
-            <p className="text-muted-foreground">{t("noResultsBody")}</p>
-            <Link
-              href="/"
-              className="inline-flex items-center rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
-            >
-              {t("goHome")}
-            </Link>
-          </section>
+          <EmptyState
+            title={t("noResultsTitle")}
+            description={t("noResultsBody")}
+          >
+            <div className="flex flex-wrap justify-center gap-3">
+              <Link
+                href="/"
+                className="inline-flex items-center rounded-lg border border-border/60 bg-background/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:bg-primary/8"
+              >
+                {t("goHome")}
+              </Link>
+              <Link
+                href="/browse"
+                className="inline-flex items-center rounded-lg border border-border/60 bg-background/80 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:bg-primary/8"
+              >
+                {t("browseSuggestion")}
+              </Link>
+            </div>
+          </EmptyState>
         ) : (
-          <section>
+          <section className="space-y-3">
             {results.map((result, i) => (
-              <DictionaryEntryComponent key={`${result.lemma_normalized}-${i}`} entry={result} />
+              <DictionaryEntryComponent
+                key={`${result.lemma_normalized}-${i}`}
+                entry={result}
+                variant="compact"
+              />
             ))}
           </section>
         )}
@@ -122,13 +144,13 @@ const SearchResultPage = ({
 
 export default SearchResultPage;
 
-export async function getServerSideProps({
+export const getServerSideProps = async ({
   query,
   res,
 }: {
   query: { term?: string; targetPage?: string };
   res: { setHeader: (name: string, value: string) => void };
-}) {
+}) => {
   res.setHeader("Cache-Control", "public");
   if (!query.term) {
     return {
@@ -150,4 +172,4 @@ export async function getServerSideProps({
       totalMatches,
     },
   };
-}
+};

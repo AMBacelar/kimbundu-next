@@ -2,34 +2,40 @@ import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/router";
 import firebase from "../../utils/firebase";
 import { getAnalytics, logEvent } from "firebase/analytics";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   searchTerm?: string;
   disabled?: boolean;
+  size?: "default" | "large";
+  autoFocus?: boolean;
 };
 
 const i18n = {
-  note: {
-    en: "Search ignores diacritics for now. If your term includes accents, try the plain spelling as well.",
-    fr: "La recherche ignore les diacritiques pour l'instant. Essayez aussi une graphie sans accents.",
-    pt: "A pesquisa ainda ignora diacriticos. Se houver acentos, tente tambem a forma sem acentos.",
-  },
-  searchTerm: {
-    en: "Search the dictionary",
-    fr: "Rechercher dans le dictionnaire",
-    pt: "Pesquisar no dicionario",
+  placeholder: {
+    en: "Search by Kimbundu word or Portuguese definition\u2026",
+    fr: "Rechercher par mot kimbundu ou définition portugaise\u2026",
+    pt: "Pesquisar por palavra kimbundu ou definição em português\u2026",
   },
   submit: {
     en: "Search",
     fr: "Rechercher",
     pt: "Pesquisar",
   },
+  label: {
+    en: "Search the dictionary",
+    fr: "Rechercher dans le dictionnaire",
+    pt: "Pesquisar no dicionário",
+  },
 };
 
-export const SearchBar = ({ searchTerm, disabled }: Props) => {
+export const SearchBar = ({
+  searchTerm,
+  disabled,
+  size = "default",
+  autoFocus = false,
+}: Props) => {
   const [searchText, setSearchText] = useState(searchTerm || "");
   const router = useRouter();
   const { locale } = router;
@@ -40,7 +46,7 @@ export const SearchBar = ({ searchTerm, disabled }: Props) => {
   const [analytics, setAnalytics] = useState<ReturnType<typeof getAnalytics> | null>(null);
 
   useEffect(() => {
-    setAnalytics(getAnalytics(firebase));
+    if (firebase) setAnalytics(getAnalytics(firebase));
   }, []);
 
   useEffect(() => {
@@ -59,33 +65,51 @@ export const SearchBar = ({ searchTerm, disabled }: Props) => {
     router.push(`/search?term=${encodeURIComponent(cleanText)}`);
   };
 
+  const isLarge = size === "large";
+
   return (
-    <div className="space-y-3">
-      <label htmlFor={inputId} className="block text-sm font-medium text-foreground">
-        {t("searchTerm")}
+    <form onSubmit={onSubmit} className="w-full">
+      <label htmlFor={inputId} className="sr-only">
+        {t("label")}
       </label>
-      <form onSubmit={onSubmit} className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Input
+      <div
+        className={cn(
+          "flex items-center gap-2 rounded-xl border border-border/60 bg-background/90 shadow-sm transition-all focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-ring/20",
+          isLarge ? "px-4 py-3 md:px-5 md:py-4" : "px-3 py-2"
+        )}
+      >
+        <Search
+          className={cn(
+            "shrink-0 text-muted-foreground",
+            isLarge ? "size-5" : "size-4"
+          )}
+          aria-hidden="true"
+        />
+        <input
           id={inputId}
           type="text"
-          placeholder={t("searchTerm")}
+          placeholder={t("placeholder")}
           name="searchText"
           value={searchText}
           disabled={disabled}
+          autoFocus={autoFocus}
           onChange={(e) => setSearchText(e.target.value)}
-          className="h-10 rounded-xl bg-background/80 px-3 text-base sm:flex-1"
+          className={cn(
+            "min-w-0 flex-1 border-none bg-transparent outline-none placeholder:text-muted-foreground/60",
+            isLarge ? "text-base md:text-lg" : "text-sm"
+          )}
         />
-        <Button
+        <button
           type="submit"
           disabled={disabled || !searchText.trim()}
-          aria-label={t("submit")}
-          className="h-10 rounded-xl px-4"
+          className={cn(
+            "shrink-0 rounded-lg bg-primary font-medium text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-40 disabled:hover:bg-primary",
+            isLarge ? "px-5 py-2 text-sm md:px-6 md:text-base" : "px-4 py-1.5 text-sm"
+          )}
         >
-          <Search className="mr-2 size-4" />
           {t("submit")}
-        </Button>
-      </form>
-      <p className="text-sm text-muted-foreground">{t("note")}</p>
-    </div>
+        </button>
+      </div>
+    </form>
   );
 };
