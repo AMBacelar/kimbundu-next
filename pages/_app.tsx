@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import "../styles/globals.css";
 import firebase from "../utils/firebase";
 import { getAnalytics, logEvent } from "firebase/analytics";
-import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const RouteProgress = () => {
   const [loading, setLoading] = useState(false);
@@ -48,7 +48,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
     <>
       <RouteProgress />
       <Component {...pageProps} />
-      <Analytics />
+      <SpeedInsights />
     </>
   );
 };
